@@ -880,11 +880,11 @@ drivers:
       domain_group:
         nodes:
         - name: EIC
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         configuration:
-          eic_gclk_selection: Generic clock generator 0
+          eic_gclk_selection: Generic clock generator 1
   EVENT_SYSTEM_0:
     user_label: EVENT_SYSTEM_0
     definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::EVSYS::driver_config_definition::Event.System::HAL:Driver:Event.system
@@ -1248,66 +1248,66 @@ drivers:
       domain_group:
         nodes:
         - name: Channel 0
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 1
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 2
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 3
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 4
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 5
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 6
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 7
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 8
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 9
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 10
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Channel 11
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         configuration:
-          evsys_clk_selection_0: Generic clock generator 0
-          evsys_clk_selection_1: Generic clock generator 0
-          evsys_clk_selection_10: Generic clock generator 0
-          evsys_clk_selection_11: Generic clock generator 0
-          evsys_clk_selection_2: Generic clock generator 0
-          evsys_clk_selection_3: Generic clock generator 0
-          evsys_clk_selection_4: Generic clock generator 0
-          evsys_clk_selection_5: Generic clock generator 0
-          evsys_clk_selection_6: Generic clock generator 0
-          evsys_clk_selection_7: Generic clock generator 0
-          evsys_clk_selection_8: Generic clock generator 0
-          evsys_clk_selection_9: Generic clock generator 0
+          evsys_clk_selection_0: Generic clock generator 1
+          evsys_clk_selection_1: Generic clock generator 1
+          evsys_clk_selection_10: Generic clock generator 1
+          evsys_clk_selection_11: Generic clock generator 1
+          evsys_clk_selection_2: Generic clock generator 1
+          evsys_clk_selection_3: Generic clock generator 1
+          evsys_clk_selection_4: Generic clock generator 1
+          evsys_clk_selection_5: Generic clock generator 1
+          evsys_clk_selection_6: Generic clock generator 1
+          evsys_clk_selection_7: Generic clock generator 1
+          evsys_clk_selection_8: Generic clock generator 1
+          evsys_clk_selection_9: Generic clock generator 1
   GCLK:
     user_label: GCLK
     definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::GCLK::driver_config_definition::GCLK::HAL:HPL:GCLK
@@ -1315,7 +1315,7 @@ drivers:
     api: HAL:HPL:GCLK
     configuration:
       enable_gclk_gen_0: true
-      enable_gclk_gen_1: false
+      enable_gclk_gen_1: true
       enable_gclk_gen_10: false
       enable_gclk_gen_11: false
       enable_gclk_gen_2: false
@@ -1341,7 +1341,7 @@ drivers:
       gclk_arch_gen_11_oe: false
       gclk_arch_gen_11_oov: false
       gclk_arch_gen_11_runstdby: false
-      gclk_arch_gen_1_enable: false
+      gclk_arch_gen_1_enable: true
       gclk_arch_gen_1_idc: false
       gclk_arch_gen_1_oe: false
       gclk_arch_gen_1_oov: false
@@ -1720,7 +1720,7 @@ drivers:
       domain_group:
         nodes:
         - name: Core
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: Slow
@@ -1728,7 +1728,7 @@ drivers:
           external: false
           external_frequency: 0
         configuration:
-          core_gclk_selection: Generic clock generator 0
+          core_gclk_selection: Generic clock generator 1
           slow_gclk_selection: Generic clock generator 3
   IO_BUS:
     user_label: IO_BUS
@@ -1763,16 +1763,16 @@ drivers:
       domain_group:
         nodes:
         - name: SDHC
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         - name: SDHC_Slow
-          input: Generic clock generator 0
+          input: Generic clock generator 3
           external: false
           external_frequency: 0
         configuration:
-          sdhc_gclk_selection: Generic clock generator 0
-          sdhc_slow_gclk_selection: Generic clock generator 0
+          sdhc_gclk_selection: Generic clock generator 1
+          sdhc_slow_gclk_selection: Generic clock generator 3
   USB_0:
     user_label: USB_0
     definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::USB::driver_config_definition::USB.Device::HAL:Driver:USB.Device
@@ -1811,11 +1811,11 @@ drivers:
       domain_group:
         nodes:
         - name: USB
-          input: Generic clock generator 0
+          input: Generic clock generator 1
           external: false
           external_frequency: 0
         configuration:
-          usb_gclk_selection: Generic clock generator 0
+          usb_gclk_selection: Generic clock generator 1
 pads:
   PA04:
     name: PA04

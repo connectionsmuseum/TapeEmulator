@@ -33,7 +33,7 @@
 
 // <i> Select the clock source for EIC.
 #ifndef CONF_GCLK_EIC_SRC
-#define CONF_GCLK_EIC_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EIC_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -41,7 +41,7 @@
  * \brief EIC's Clock frequency
  */
 #ifndef CONF_GCLK_EIC_FREQUENCY
-#define CONF_GCLK_EIC_FREQUENCY 120000000
+#define CONF_GCLK_EIC_FREQUENCY 48000000
 #endif
 
 // <y> EVSYS Channel 0 Clock Source
@@ -73,7 +73,7 @@
 
 // <i> Select the clock source for channel 0.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_0_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_0_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_0_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -82,7 +82,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_0_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_0_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_0_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 1 Clock Source
@@ -114,7 +114,7 @@
 
 // <i> Select the clock source for channel 1.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_1_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_1_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_1_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -123,7 +123,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_1_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_1_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_1_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 2 Clock Source
@@ -155,7 +155,7 @@
 
 // <i> Select the clock source for channel 2.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_2_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_2_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_2_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -164,7 +164,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_2_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_2_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_2_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 3 Clock Source
@@ -196,7 +196,7 @@
 
 // <i> Select the clock source for channel 3.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_3_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_3_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_3_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -205,7 +205,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_3_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_3_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_3_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 4 Clock Source
@@ -237,7 +237,7 @@
 
 // <i> Select the clock source for channel 4.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_4_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_4_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_4_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -246,7 +246,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_4_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_4_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_4_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 5 Clock Source
@@ -278,7 +278,7 @@
 
 // <i> Select the clock source for channel 5.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_5_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_5_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_5_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -287,7 +287,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_5_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_5_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_5_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 6 Clock Source
@@ -319,7 +319,7 @@
 
 // <i> Select the clock source for channel 6.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_6_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_6_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_6_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -328,7 +328,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_6_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_6_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_6_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 7 Clock Source
@@ -360,7 +360,7 @@
 
 // <i> Select the clock source for channel 7.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_7_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_7_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_7_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -369,7 +369,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_7_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_7_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_7_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 8 Clock Source
@@ -401,7 +401,7 @@
 
 // <i> Select the clock source for channel 8.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_8_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_8_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_8_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -410,7 +410,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_8_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_8_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_8_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 9 Clock Source
@@ -442,7 +442,7 @@
 
 // <i> Select the clock source for channel 9.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_9_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_9_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_9_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -451,7 +451,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_9_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_9_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_9_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 10 Clock Source
@@ -483,7 +483,7 @@
 
 // <i> Select the clock source for channel 10.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_10_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_10_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_10_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -492,7 +492,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_10_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_10_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_10_FREQUENCY 48000000.0
 #endif
 
 // <y> EVSYS Channel 11 Clock Source
@@ -524,7 +524,7 @@
 
 // <i> Select the clock source for channel 11.
 #ifndef CONF_GCLK_EVSYS_CHANNEL_11_SRC
-#define CONF_GCLK_EVSYS_CHANNEL_11_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_EVSYS_CHANNEL_11_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 /**
@@ -533,7 +533,7 @@
  */
 
 #ifndef CONF_GCLK_EVSYS_CHANNEL_11_FREQUENCY
-#define CONF_GCLK_EVSYS_CHANNEL_11_FREQUENCY 120000000.0
+#define CONF_GCLK_EVSYS_CHANNEL_11_FREQUENCY 48000000.0
 #endif
 
 /**
@@ -589,7 +589,7 @@
 
 // <i> Select the clock source for CORE.
 #ifndef CONF_GCLK_SERCOM0_CORE_SRC
-#define CONF_GCLK_SERCOM0_CORE_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_SERCOM0_CORE_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 // <y> Slow Clock Source
@@ -629,7 +629,7 @@
  * \brief SERCOM0's Core Clock frequency
  */
 #ifndef CONF_GCLK_SERCOM0_CORE_FREQUENCY
-#define CONF_GCLK_SERCOM0_CORE_FREQUENCY 120000000
+#define CONF_GCLK_SERCOM0_CORE_FREQUENCY 48000000
 #endif
 
 /**
@@ -670,7 +670,7 @@
 // <i> Select the clock source for SDHC.
 // <id> sdhc_gclk_selection
 #ifndef CONF_GCLK_SDHC0_SRC
-#define CONF_GCLK_SDHC0_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_SDHC0_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 #endif
 
 // <y> SDHC clock slow source
@@ -702,7 +702,7 @@
 // <i> Select the clock source for SDHC.
 // <id> sdhc_slow_gclk_selection
 #ifndef CONF_GCLK_SDHC0_SLOW_SRC
-#define CONF_GCLK_SDHC0_SLOW_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_SDHC0_SLOW_SRC GCLK_PCHCTRL_GEN_GCLK3_Val
 #endif
 // </h>
 
@@ -711,7 +711,7 @@
  * \brief SDHC's Clock frequency
  */
 #ifndef CONF_SDHC0_FREQUENCY
-#define CONF_SDHC0_FREQUENCY 120000000
+#define CONF_SDHC0_FREQUENCY 48000000
 #endif
 
 /**
@@ -719,7 +719,7 @@
  * \brief SDHC's Clock slow frequency
  */
 #ifndef CONF_SDHC0_SLOW_FREQUENCY
-#define CONF_SDHC0_SLOW_FREQUENCY 120000000
+#define CONF_SDHC0_SLOW_FREQUENCY 32768
 #endif
 
 // <y> USB Clock Source
@@ -751,7 +751,7 @@
 
 // <i> Select the clock source for USB.
 #ifndef CONF_GCLK_USB_SRC
-#define CONF_GCLK_USB_SRC GCLK_PCHCTRL_GEN_GCLK0_Val
+#define CONF_GCLK_USB_SRC GCLK_PCHCTRL_GEN_GCLK1_Val
 
 #endif
 
@@ -760,7 +760,7 @@
  * \brief USB's Clock frequency
  */
 #ifndef CONF_GCLK_USB_FREQUENCY
-#define CONF_GCLK_USB_FREQUENCY 120000000
+#define CONF_GCLK_USB_FREQUENCY 48000000
 #endif
 
 // <<< end of configuration section >>>
