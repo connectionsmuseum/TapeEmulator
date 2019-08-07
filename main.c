@@ -63,6 +63,8 @@ int main(void)
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
 
+    gpio_set_pin_level(D13, true);
+
     //composite_device_start();
 
     xTaskCreate(blinkTask, "BlinkTask", 200,

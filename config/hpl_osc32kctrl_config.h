@@ -17,7 +17,7 @@
 // <i> This defines the clock source for RTC
 // <id> rtc_source_oscillator
 #ifndef CONF_RTCCTRL_SRC
-#define CONF_RTCCTRL_SRC GCLK_GENCTRL_SRC_XOSC32K
+#define CONF_RTCCTRL_SRC GCLK_GENCTRL_SRC_OSCULP32K
 #endif
 
 // <q> Use 1 kHz output
@@ -71,7 +71,7 @@
 // <i> Indicates whether On Demand Control is enabled or not
 // <id> xosc32k_arch_ondemand
 #ifndef CONF_XOSC32K_ONDEMAND
-#define CONF_XOSC32K_ONDEMAND 1
+#define CONF_XOSC32K_ONDEMAND 0
 #endif
 
 // <q> Run in Standby
@@ -106,7 +106,7 @@
 // <i> Indicates whether Clock Failure Detector is enabled or not
 // <id> xosc32k_arch_cfden
 #ifndef CONF_XOSC32K_CFDEN
-#define CONF_XOSC32K_CFDEN 0
+#define CONF_XOSC32K_CFDEN 1
 #endif
 
 // <q> Clock Failure Detector Event Out
