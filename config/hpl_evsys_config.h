@@ -6382,7 +6382,7 @@
 // <id> evsys_channel_17
 // <i> Indicates which channel is chosen for user
 #ifndef CONF_CHANNEL_17
-#define CONF_CHANNEL_17 0
+#define CONF_CHANNEL_17 1
 #endif
 
 // <o> Channel selection for TCC0 Event 1
@@ -7464,7 +7464,7 @@
 // <id> evsys_channel_44
 // <i> Indicates which channel is chosen for user
 #ifndef CONF_CHANNEL_44
-#define CONF_CHANNEL_44 0
+#define CONF_CHANNEL_44 1
 #endif
 
 // <o> Channel selection for TC1 event

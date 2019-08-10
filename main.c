@@ -47,12 +47,12 @@ void blinkTask(void *pvParameters) {
         if (cdcdf_acm_is_enabled()) {
             // ret = cdcdf_acm_write(buf, 7);
         }
-        delay_ms(1000);
+        delay_ms(500);
 
         gpio_set_pin_level(D13, true);
         // pixel(false);
         // io_write(io, buf, 7);
-        delay_ms(1000);
+        delay_ms(500);
     }
 }
 
@@ -65,10 +65,33 @@ int main(void)
 
     gpio_set_pin_level(D13, true);
 
+    // hri_portgroup_set_PINCFG_PMUXEN_bit(PORT->Group[GPIO_PORTB], 14);
+    // hri_portgroup_set_PMUX_PMUXE_bf(PORT->Group[GPIO_PORTB], 14, );
+
+    // Possible combinations are listed in samd51a/include/pio/samd51p20a.h
+    // PB22 -> D10, PINMUX_PB22M_GCLK_IO0
+    // PB23 -> D11, PINMUX_PB23M_GCLK_IO1
+    gpio_set_pin_direction(D11, GPIO_DIRECTION_OUT);
+    gpio_set_pin_pull_mode(D11, GPIO_PULL_DOWN);
+    gpio_set_pin_function(D11, MUX_PB23M_GCLK_IO1);
+    gpio_set_pin_function(PCC_D0, MUX_PA16M_GCLK_IO2);
+
+    // Move this out of the RTOS task. Inside the ROTS task 500ms is too
+    // long and the RTOS interrupt breaks the timing. 
+    while (1) {
+        gpio_set_pin_level(D13, false);
+        delay_ms(500);
+
+        gpio_set_pin_level(D13, true);
+        delay_ms(500);
+    }
+
     //composite_device_start();
 
+    /*
     xTaskCreate(blinkTask, "BlinkTask", 200,
                 (void *) NULL, 1, NULL);
+                */
 
     //cdcdf_acm_write(good_str, 4);
 

@@ -621,7 +621,7 @@
 
 // <i> Select the slow clock source.
 #ifndef CONF_GCLK_SERCOM0_SLOW_SRC
-#define CONF_GCLK_SERCOM0_SLOW_SRC GCLK_PCHCTRL_GEN_GCLK3_Val
+#define CONF_GCLK_SERCOM0_SLOW_SRC GCLK_PCHCTRL_GEN_GCLK2_Val
 #endif
 
 /**
@@ -702,7 +702,7 @@
 // <i> Select the clock source for SDHC.
 // <id> sdhc_slow_gclk_selection
 #ifndef CONF_GCLK_SDHC0_SLOW_SRC
-#define CONF_GCLK_SDHC0_SLOW_SRC GCLK_PCHCTRL_GEN_GCLK3_Val
+#define CONF_GCLK_SDHC0_SLOW_SRC GCLK_PCHCTRL_GEN_GCLK2_Val
 #endif
 // </h>
 

@@ -24,7 +24,7 @@
 // <id> rtc_1khz_selection
 #ifndef CONF_RTCCTRL_1KHZ
 
-#define CONF_RTCCTRL_1KHZ 0
+#define CONF_RTCCTRL_1KHZ 1
 
 #endif
 
@@ -43,7 +43,7 @@
 // <i> Indicates whether configuration for External 32K Osc is enabled or not
 // <id> enable_xosc32k
 #ifndef CONF_XOSC32K_CONFIG
-#define CONF_XOSC32K_CONFIG 1
+#define CONF_XOSC32K_CONFIG 0
 #endif
 
 // <h> 32kHz External Crystal Oscillator Control
@@ -51,7 +51,7 @@
 // <i> Indicates whether 32kHz External Crystal Oscillator is enabled or not
 // <id> xosc32k_arch_enable
 #ifndef CONF_XOSC32K_ENABLE
-#define CONF_XOSC32K_ENABLE 1
+#define CONF_XOSC32K_ENABLE 0
 #endif
 
 // <o> Start-Up Time
@@ -71,7 +71,7 @@
 // <i> Indicates whether On Demand Control is enabled or not
 // <id> xosc32k_arch_ondemand
 #ifndef CONF_XOSC32K_ONDEMAND
-#define CONF_XOSC32K_ONDEMAND 0
+#define CONF_XOSC32K_ONDEMAND 1
 #endif
 
 // <q> Run in Standby
@@ -106,7 +106,7 @@
 // <i> Indicates whether Clock Failure Detector is enabled or not
 // <id> xosc32k_arch_cfden
 #ifndef CONF_XOSC32K_CFDEN
-#define CONF_XOSC32K_CFDEN 1
+#define CONF_XOSC32K_CFDEN 0
 #endif
 
 // <q> Clock Failure Detector Event Out
@@ -120,7 +120,7 @@
 // <i> Indicates whether the connections between the I/O pads and the external clock or crystal oscillator is enabled or not
 // <id> xosc32k_arch_xtalen
 #ifndef CONF_XOSC32K_XTALEN
-#define CONF_XOSC32K_XTALEN 1
+#define CONF_XOSC32K_XTALEN 0
 #endif
 
 // <o> Control Gain Mode
