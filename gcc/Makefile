@@ -313,10 +313,10 @@ vpath %.s ../
 vpath %.S ../
 
 # All Target
-all: $(SUB_DIRS) $(OUTPUT_FILE_PATH)
+all: $(SUB_DIRS) $(OUTPUT_UF2)
 
 $(OUTPUT_UF2): $(OUTPUT_FILE_PATH)
-	python uf2conv.py -c -b 0x4000 -o $(OUTPUT_UF2) gcc/$(OUTPUT_FILE_NAME).bin
+	python3 uf2conv.py -c -b 0x4000 -o $(OUTPUT_UF2) $(OUTPUT_FILE_NAME).bin
 
 # Linker target
 

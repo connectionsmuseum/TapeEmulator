@@ -45,7 +45,7 @@
 
 #ifndef CONF_RTC_COMP_VAL
 
-#define CONF_RTC_COMP_VAL 32
+#define CONF_RTC_COMP_VAL 1
 
 #endif
 
