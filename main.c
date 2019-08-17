@@ -15,26 +15,6 @@ static void tx_complete_cb_SPI_SERCOM0(struct _dma_resource *resource)
 	/* Transfer completed */
 }
 
-void pixel(bool state) {
-
-    struct io_descriptor *ipixel_io;
-    uint8_t frame[] = {
-        0x0, 0x0, 0x0, 0x0,
-        0xe0, 0x0, 0x0, 0x0,
-        0x1, 0x1, 0x1, 0x1 };
-    // spi_m_sync_get_io_descriptor(&SPI_SERCOM5, &ipixel_io);
-
-    if(state) {
-        frame[4] &= 0x10;
-        frame[7] &= 0xFF;
-    } else {
-        frame[4] &= 0x10;
-        frame[6] &= 0xFF;
-    }
-    io_write(ipixel_io, frame, 12);
-
-}
-
 void blinkTask(void *pvParameters) {
     int ret;
     struct io_descriptor *io;
@@ -43,14 +23,12 @@ void blinkTask(void *pvParameters) {
     // spi_m_sync_enable(&SPI_SERCOM5);
     while (1) {
         gpio_set_pin_level(D13, false);
-        // pixel(true);
         if (cdcdf_acm_is_enabled()) {
             // ret = cdcdf_acm_write(buf, 7);
         }
         delay_ms(500);
 
         gpio_set_pin_level(D13, true);
-        // pixel(false);
         // io_write(io, buf, 7);
         delay_ms(500);
     }
@@ -58,6 +36,9 @@ void blinkTask(void *pvParameters) {
 
 static struct timer_task TIMER_0_task1;
 bool d13_state = false;
+bool pixel_state = false;
+// This is nonsense
+void *const delay_hw;
 
 static void TIMER_0_d13_cb(const struct timer_task *const timer_task)
 {
@@ -70,11 +51,64 @@ static void TIMER_0_d13_cb(const struct timer_task *const timer_task)
     }
 }
 
+
+void send_bit(int x) {
+
+    uint16_t cycles_080 = 8;
+    uint16_t cycles_085 = 9;
+    uint16_t cycles_040 = 3;
+    uint16_t cycles_045 = 4;
+
+    if(x == 1) {
+        gpio_set_pin_level(NEOPIX, true);
+        // T1H 0.8 us
+        _delay_cycles(delay_hw, cycles_080);
+        gpio_set_pin_level(NEOPIX, false);
+        // T1L 0.45 us
+        _delay_cycles(delay_hw, cycles_040);
+    } else {
+        gpio_set_pin_level(NEOPIX, true);
+        // T0H 0.4 us
+        _delay_cycles(delay_hw, cycles_040);
+
+        gpio_set_pin_level(NEOPIX, false);
+        // T0L 0.85 us
+        _delay_cycles(delay_hw, cycles_085);
+    }
+}
+
+void send_rgb(uint8_t red, uint8_t green, uint8_t blue) {
+
+    for(int i=7; i>= 0; i--) {
+        send_bit((green >> i) & 0x1);
+    }
+    for(int i=7; i>= 0; i--) {
+        send_bit((red >> i) & 0x1);
+    }
+    for(int i=7; i>= 0; i--) {
+        send_bit((blue >> i) & 0x1);
+    }
+
+}
+
+static void TIMER_0_pixel_cb(const struct timer_task *const timer_task)
+{
+    if(pixel_state) {
+        send_rgb(8, 0, 0);
+        pixel_state = false;
+    } else {
+        send_rgb(0, 0, 8);
+        pixel_state = true;
+    }
+}
+
+
 void TIMER_LED(void)
 {
     // Timer ticks are ~1ms, see in config/hpl_rtc_config.h
-    TIMER_0_task1.interval = 100;
-    TIMER_0_task1.cb       = TIMER_0_d13_cb;
+    TIMER_0_task1.interval = 400;
+    // TIMER_0_task1.cb       = TIMER_0_d13_cb;
+    TIMER_0_task1.cb       = TIMER_0_pixel_cb;
     TIMER_0_task1.mode     = TIMER_TASK_REPEAT;
 
 
@@ -84,12 +118,8 @@ void TIMER_LED(void)
 
 int main(void)
 {
-    unsigned char good_str[] = "GOOD";
-    // unsigned char err_str[] = "ERR";
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
-
-    gpio_set_pin_level(D13, true);
 
     TIMER_LED();
 

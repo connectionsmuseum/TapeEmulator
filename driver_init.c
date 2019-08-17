@@ -559,6 +559,10 @@ void system_init(void)
 	                   // <true"> High
 	                   false);
 
+	gpio_set_pin_level(NEOPIX, false);
+	gpio_set_pin_direction(NEOPIX, GPIO_DIRECTION_OUT);
+	gpio_set_pin_function(NEOPIX, GPIO_PIN_FUNCTION_OFF);
+
 	// Set pin direction to output
 	gpio_set_pin_direction(A2, GPIO_DIRECTION_OUT);
 
