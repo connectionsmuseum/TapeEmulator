@@ -563,6 +563,21 @@ void system_init(void)
 	gpio_set_pin_direction(NEOPIX, GPIO_DIRECTION_OUT);
 	gpio_set_pin_function(NEOPIX, GPIO_PIN_FUNCTION_OFF);
 
+	gpio_set_pin_direction(PIN_FORWARD, GPIO_DIRECTION_IN);
+	gpio_set_pin_function(PIN_FORWARD, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_pull_mode(PIN_FORWARD, GPIO_PULL_DOWN);
+	gpio_set_pin_direction(PIN_FF, GPIO_DIRECTION_IN);
+	gpio_set_pin_function(PIN_FF, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_pull_mode(PIN_FF, GPIO_PULL_DOWN);
+
+	gpio_set_pin_direction(PIN_REV, GPIO_DIRECTION_IN);
+	gpio_set_pin_function(PIN_REV, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_pull_mode(PIN_REV, GPIO_PULL_DOWN);
+
+	gpio_set_pin_direction(PIN_FR, GPIO_DIRECTION_IN);
+	gpio_set_pin_function(PIN_FR, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_pull_mode(PIN_FR, GPIO_PULL_DOWN);
+
 	// Set pin direction to output
 	gpio_set_pin_direction(A2, GPIO_DIRECTION_OUT);
 

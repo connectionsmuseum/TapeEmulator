@@ -6,37 +6,17 @@
 #include "task.h"
 #include "timers.h"
 
-// struct spi_m_sync_descriptor *spi;
-
-static uint8_t buf[] = "ABCDEFG";
-
-static void tx_complete_cb_SPI_SERCOM0(struct _dma_resource *resource)
-{
-	/* Transfer completed */
-}
-
-void blinkTask(void *pvParameters) {
-    int ret;
-    struct io_descriptor *io;
-    // spi_m_dma_get_io_descriptor(&SPI_SERCOM0, &io);
-    // spi_m_dma_enable(&SPI_SERCOM0);
-    // spi_m_sync_enable(&SPI_SERCOM5);
-    while (1) {
-        gpio_set_pin_level(D13, false);
-        if (cdcdf_acm_is_enabled()) {
-            // ret = cdcdf_acm_write(buf, 7);
-        }
-        delay_ms(500);
-
-        gpio_set_pin_level(D13, true);
-        // io_write(io, buf, 7);
-        delay_ms(500);
-    }
-}
+#define STATE_IDLE 0
+#define STATE_FORWARD 1
+#define STATE_FF 2
+#define STATE_REV 3
+#define STATE_FR 4
 
 static struct timer_task TIMER_0_task1;
+static struct timer_task TIMER_0_task2;
 bool d13_state = false;
 bool pixel_state = false;
+static int tape_state = STATE_IDLE;
 // This is nonsense
 void *const delay_hw;
 
@@ -91,14 +71,37 @@ void send_rgb(uint8_t red, uint8_t green, uint8_t blue) {
 
 }
 
-static void TIMER_0_pixel_cb(const struct timer_task *const timer_task)
-{
-    if(pixel_state) {
-        send_rgb(8, 0, 0);
-        pixel_state = false;
+void toggle_pixel(bool *state_variable, uint8_t red, uint8_t green, uint8_t blue) {
+
+    if(*state_variable) {
+        send_rgb(red, green, blue);
+        *state_variable = false;
     } else {
-        send_rgb(0, 0, 8);
+        send_rgb(0, 0, 0);
+        *state_variable = true;
+    }
+}
+
+static void TIMER_0_slow_pixel_cb(const struct timer_task *const timer_task)
+{
+    if(tape_state == STATE_IDLE) { 
+        send_rgb(0, 0, 0);
         pixel_state = true;
+    } else if (tape_state == STATE_FORWARD) {
+        toggle_pixel(&pixel_state, 0, 10, 0);
+    } else if (tape_state == STATE_REV) {
+        toggle_pixel(&pixel_state, 10, 0, 0);
+    }
+}
+
+static void TIMER_0_fast_pixel_cb(const struct timer_task *const timer_task)
+{
+    if(tape_state == STATE_IDLE) { 
+        return;
+    } else if (tape_state == STATE_FF) {
+        toggle_pixel(&pixel_state, 0, 10, 0);
+    } else if (tape_state == STATE_FR) {
+        toggle_pixel(&pixel_state, 10, 0, 0);
     }
 }
 
@@ -106,15 +109,35 @@ static void TIMER_0_pixel_cb(const struct timer_task *const timer_task)
 void TIMER_LED(void)
 {
     // Timer ticks are ~1ms, see in config/hpl_rtc_config.h
-    TIMER_0_task1.interval = 400;
-    // TIMER_0_task1.cb       = TIMER_0_d13_cb;
-    TIMER_0_task1.cb       = TIMER_0_pixel_cb;
+    TIMER_0_task1.interval = 250;
+    TIMER_0_task1.cb       = TIMER_0_slow_pixel_cb;
     TIMER_0_task1.mode     = TIMER_TASK_REPEAT;
+    TIMER_0_task2.interval = 100;
+    TIMER_0_task2.cb       = TIMER_0_fast_pixel_cb;
+    TIMER_0_task2.mode     = TIMER_TASK_REPEAT;
 
 
     timer_add_task(&TIMER_0, &TIMER_0_task1);
+    timer_add_task(&TIMER_0, &TIMER_0_task2);
     timer_start(&TIMER_0);
 }
+
+
+
+void update_state() {
+    if (gpio_get_pin_level(PIN_FORWARD)) {
+        tape_state = STATE_FORWARD;
+    } else if (gpio_get_pin_level(PIN_FF)) {
+        tape_state = STATE_FF;
+    } else if (gpio_get_pin_level(PIN_REV)) {
+        tape_state = STATE_REV;
+    } else if (gpio_get_pin_level(PIN_FR)) {
+        tape_state = STATE_FR;
+    } else {
+        tape_state = STATE_IDLE;
+    }
+}
+
 
 int main(void)
 {
@@ -137,20 +160,9 @@ int main(void)
     gpio_set_pin_function(PCC_D0, MUX_PA16M_GCLK_IO2);
     */
 
-    // Move this out of the RTOS task. Inside the ROTS task 500ms is too
-    // long and the RTOS interrupt breaks the timing. 
-    //
-    /*
-    while (1) {
-        gpio_set_pin_level(D13, false);
-        delay_ms(500);
-
-        gpio_set_pin_level(D13, true);
-        delay_ms(500);
-    }
-    */
     while(1) {
-        delay_ms(500);
+        update_state();
+        delay_ms(10);
     }
 
     //composite_device_start();
@@ -160,11 +172,14 @@ int main(void)
                 (void *) NULL, 1, NULL);
                 */
 
-    //cdcdf_acm_write(good_str, 4);
+    /*
+    if (cdcdf_acm_is_enabled()) {
+        ret = cdcdf_acm_write(buf, 7);
+    }
+    */
 
     //spi_m_dma_register_callback(&SPI_SERCOM0, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_SERCOM0);
 
-    gpio_set_pin_level(D13, true);
     vTaskStartScheduler();
 }
 
