@@ -15,7 +15,8 @@
 
 struct timer_descriptor      TIMER_0;
 struct spi_m_sync_descriptor SPI_0;
-struct spi_m_async_descriptor SPI_1;
+
+struct spi_m_dma_descriptor SPI_1;
 
 struct mci_sync_desc IO_BUS;
 
@@ -56,7 +57,7 @@ void SPI_1_PORT_init(void)
     gpio_set_pin_function(D36, PINMUX_PA17C_SERCOM1_PAD1);
     gpio_set_pin_pull_mode(D36, GPIO_PULL_OFF);
 
-    gpio_set_pin_direction(D35, GPIO_DIRECTION_OUT);
+    gpio_set_pin_direction(D35, GPIO_DIRECTION_IN);
     gpio_set_pin_function(D35, PINMUX_PA18C_SERCOM1_PAD2);
     gpio_set_pin_pull_mode(D35, GPIO_PULL_OFF);
     
@@ -134,7 +135,7 @@ void SPI_1_CLOCK_init(void)
 void SPI_1_init(void)
 {
 	SPI_1_CLOCK_init();
-	spi_m_async_init(&SPI_1, SERCOM1);
+	spi_m_dma_init(&SPI_1, SERCOM1);
 	SPI_1_PORT_init();
 }
 

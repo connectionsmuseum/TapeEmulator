@@ -1730,6 +1730,53 @@ drivers:
         configuration:
           core_gclk_selection: Generic clock generator 1
           slow_gclk_selection: Generic clock generator 3
+  SPI_1:
+    user_label: SPI_1
+    definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::SERCOM1::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.DMA
+    functionality: SPI
+    api: HAL:Driver:SPI_Master_DMA
+    configuration:
+      spi_master_advanced: true
+      spi_master_arch_cpha: Sample input on leading edge
+      spi_master_arch_cpol: SCK is low when idle
+      spi_master_arch_dbgstop: Keep running
+      spi_master_arch_dord: MSB first
+      spi_master_arch_ibon: In data stream
+      spi_master_arch_runstdby: false
+      spi_master_baud_rate: 4000
+      spi_master_character_size: 8 bits
+      spi_master_dma_rx_channel: 1
+      spi_master_dma_tx_channel: 0
+      spi_master_dummybyte: 511
+      spi_master_rx_channel: true
+      spi_master_rx_enable: true
+    optional_signals: []
+    variant:
+      specification: TXPO=0, RXPO=2
+      required_signals:
+      - name: SERCOM1/PAD/0
+        pad: PA16
+        label: MOSI
+      - name: SERCOM1/PAD/1
+        pad: PA17
+        label: SCK
+      - name: SERCOM1/PAD/2
+        pad: PA18
+        label: MISO
+    clocks:
+      domain_group:
+        nodes:
+        - name: Core
+          input: Generic clock generator 0
+          external: false
+          external_frequency: 0
+        - name: Slow
+          input: Generic clock generator 3
+          external: false
+          external_frequency: 0
+        configuration:
+          core_gclk_selection: Generic clock generator 0
+          slow_gclk_selection: Generic clock generator 3
   IO_BUS:
     user_label: IO_BUS
     definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::SDHC0::driver_config_definition::MCI::HAL:Driver:MCI.Sync
@@ -1870,6 +1917,24 @@ pads:
     definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::pad::PB11
     mode: Advanced
     user_label: PB11
+    configuration: null
+  PA16:
+    name: PA16
+    definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::pad::PA16
+    mode: Digital output
+    user_label: PA16
+    configuration: null
+  PA17:
+    name: PA17
+    definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::pad::PA17
+    mode: Digital output
+    user_label: PA17
+    configuration: null
+  PA18:
+    name: PA18
+    definition: Atmel:SAMD51_Drivers:0.0.1::SAMD51P20A-AF::pad::PA18
+    mode: Digital input
+    user_label: PA18
     configuration: null
   PA24:
     name: PA24

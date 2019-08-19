@@ -71,6 +71,7 @@ thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/event_groups.o \
 sd_mmc_start.o \
 usb/class/hid/device/hiddf_generic.o \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/croutine.o \
+hal/src/hal_spi_m_dma.o \
 samd51a/gcc/system_samd51.o \
 hpl/eic/hpl_eic.o \
 hpl/evsys/hpl_evsys.o \
@@ -133,6 +134,7 @@ OBJS_AS_ARGS +=  \
 "sd_mmc_start.o" \
 "usb/class/hid/device/hiddf_generic.o" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/croutine.o" \
+"hal/src/hal_spi_m_dma.o" \
 "samd51a/gcc/system_samd51.o" \
 "hpl/eic/hpl_eic.o" \
 "hpl/evsys/hpl_evsys.o" \
@@ -254,6 +256,7 @@ DEPS_AS_ARGS +=  \
 "usb/class/cdc/device/cdcdf_acm.d" \
 "sd_mmc_start.d" \
 "samd51a/gcc/system_samd51.d" \
+"hal/src/hal_spi_m_dma.d" \
 "hpl/usb/hpl_usb.d" \
 "main.d" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/timers.d" \

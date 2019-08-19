@@ -56,3 +56,29 @@ void SPI_0_example(void)
 	spi_m_sync_enable(&SPI_0);
 	io_write(io, example_SPI_0, 12);
 }
+
+/**
+ * Example of using SPI_1 to write "Hello World" using the IO abstraction.
+ *
+ * Since the driver is asynchronous we need to use statically allocated memory for string
+ * because driver initiates transfer and then returns before the transmission is completed.
+ *
+ * Once transfer has been completed the tx_cb function will be called.
+ */
+
+static uint8_t example_SPI_1[12] = "Hello World!";
+
+static void tx_complete_cb_SPI_1(struct _dma_resource *resource)
+{
+	/* Transfer completed */
+}
+
+void SPI_1_example(void)
+{
+	struct io_descriptor *io;
+	spi_m_dma_get_io_descriptor(&SPI_1, &io);
+
+	spi_m_dma_register_callback(&SPI_1, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_1);
+	spi_m_dma_enable(&SPI_1);
+	io_write(io, example_SPI_1, 12);
+}
