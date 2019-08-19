@@ -2,3 +2,5 @@
 gcc/TapeEmulator.*
 gcc/*.o
 gcc/*.d
+gcc/**/*.o
+gcc/**/*.d
