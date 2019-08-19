@@ -15,6 +15,7 @@
 
 struct timer_descriptor      TIMER_0;
 struct spi_m_sync_descriptor SPI_0;
+struct spi_m_async_descriptor SPI_1;
 
 struct mci_sync_desc IO_BUS;
 
@@ -43,6 +44,27 @@ static void TIMER_0_init(void)
 {
 	hri_mclk_set_APBAMASK_RTC_bit(MCLK);
 	timer_init(&TIMER_0, RTC, _rtc_get_timer());
+}
+
+void SPI_1_PORT_init(void)
+{
+    gpio_set_pin_direction(D37, GPIO_DIRECTION_OUT);
+    gpio_set_pin_function(D37, PINMUX_PA16C_SERCOM1_PAD0);
+    gpio_set_pin_pull_mode(D37, GPIO_PULL_OFF);
+
+    gpio_set_pin_direction(D36, GPIO_DIRECTION_OUT);
+    gpio_set_pin_function(D36, PINMUX_PA17C_SERCOM1_PAD1);
+    gpio_set_pin_pull_mode(D36, GPIO_PULL_OFF);
+
+    gpio_set_pin_direction(D35, GPIO_DIRECTION_OUT);
+    gpio_set_pin_function(D35, PINMUX_PA18C_SERCOM1_PAD2);
+    gpio_set_pin_pull_mode(D35, GPIO_PULL_OFF);
+    
+    gpio_set_pin_direction(D34, GPIO_DIRECTION_OUT);
+    gpio_set_pin_function(D34, PINMUX_PA19C_SERCOM1_PAD3);
+    gpio_set_pin_pull_mode(D34, GPIO_PULL_OFF);
+
+    
 }
 
 void SPI_0_PORT_init(void)
@@ -99,6 +121,21 @@ void SPI_0_init(void)
 	SPI_0_CLOCK_init();
 	spi_m_sync_init(&SPI_0, SERCOM0);
 	SPI_0_PORT_init();
+}
+
+void SPI_1_CLOCK_init(void)
+{
+	hri_gclk_write_PCHCTRL_reg(GCLK, SERCOM1_GCLK_ID_CORE, CONF_GCLK_SERCOM1_CORE_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+	hri_gclk_write_PCHCTRL_reg(GCLK, SERCOM1_GCLK_ID_SLOW, CONF_GCLK_SERCOM1_SLOW_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+
+	hri_mclk_set_APBAMASK_SERCOM1_bit(MCLK);
+}
+
+void SPI_1_init(void)
+{
+	SPI_1_CLOCK_init();
+	spi_m_async_init(&SPI_1, SERCOM1);
+	SPI_1_PORT_init();
 }
 
 void IO_BUS_PORT_init(void)
@@ -590,6 +627,8 @@ void system_init(void)
 	TIMER_0_init();
 
 	SPI_0_init();
+
+        SPI_1_init();
 
 	IO_BUS_init();
 

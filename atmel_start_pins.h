@@ -54,4 +54,12 @@
 #define PIN_REV     GPIO(GPIO_PORTC,  6) // D46
 #define PIN_FR      GPIO(GPIO_PORTC,  4) // D48
 
+
+// SERCOM ports for data out
+#define D37 GPIO(GPIO_PORTA, 16) // PCC_D0, SERCOM1.0+3.1
+#define D36 GPIO(GPIO_PORTA, 17) // PCC_D1, SERCOM1.1+3.0
+#define D35 GPIO(GPIO_PORTA, 18) // PCC_D2, SERCOM1.2+3.2
+#define D34 GPIO(GPIO_PORTA, 19) // PCC_D3, SERCOM1.3+3.3
+
+
 #endif // ATMEL_START_PINS_H_INCLUDED

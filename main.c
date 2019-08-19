@@ -39,6 +39,7 @@ void send_bit(int x) {
     uint16_t cycles_040 = 3;
     uint16_t cycles_045 = 4;
 
+    // Ideally this section should be uninterruptable.
     if(x == 1) {
         gpio_set_pin_level(NEOPIX, true);
         // T1H 0.8 us
