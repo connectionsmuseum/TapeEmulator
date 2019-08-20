@@ -627,7 +627,7 @@ void system_init(void)
 
 	TIMER_0_init();
 
-	SPI_0_init();
+	// SPI_0_init();
 
         SPI_1_init();
 

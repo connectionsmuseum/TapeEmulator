@@ -34,19 +34,25 @@ static void TIMER_0_d13_cb(const struct timer_task *const timer_task)
 
 void send_bit(int x) {
 
+    /* These worked once, but mysterously stopped.
     uint16_t cycles_080 = 8;
     uint16_t cycles_085 = 9;
     uint16_t cycles_040 = 3;
     uint16_t cycles_045 = 4;
+    */
+    uint16_t cycles_080 = 20;
+    uint16_t cycles_085 = 21;
+    uint16_t cycles_040 = 8;
+    uint16_t cycles_045 = 9;
 
-    // Ideally this section should be uninterruptable.
+    CRITICAL_SECTION_ENTER();
     if(x == 1) {
         gpio_set_pin_level(NEOPIX, true);
         // T1H 0.8 us
         _delay_cycles(delay_hw, cycles_080);
         gpio_set_pin_level(NEOPIX, false);
         // T1L 0.45 us
-        _delay_cycles(delay_hw, cycles_040);
+        _delay_cycles(delay_hw, cycles_045);
     } else {
         gpio_set_pin_level(NEOPIX, true);
         // T0H 0.4 us
@@ -56,6 +62,7 @@ void send_bit(int x) {
         // T0L 0.85 us
         _delay_cycles(delay_hw, cycles_085);
     }
+    CRITICAL_SECTION_LEAVE();
 }
 
 void send_rgb(uint8_t red, uint8_t green, uint8_t blue) {
