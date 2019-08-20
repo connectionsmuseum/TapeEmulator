@@ -123,7 +123,8 @@ sd_mmc/sd_mmc.o \
 atmel_start.o \
 usb/device/usbdc.o \
 hpl/cmcc/hpl_cmcc.o \
-thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o
+thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o \
+pixel.o
 
 OBJS_AS_ARGS +=  \
 "hal/src/hal_io.o" \
@@ -186,7 +187,8 @@ OBJS_AS_ARGS +=  \
 "atmel_start.o" \
 "usb/device/usbdc.o" \
 "hpl/cmcc/hpl_cmcc.o" \
-"thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o"
+"thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o" \
+"pixel.o"
 
 # List the directories containing header files
 DIR_INCLUDES +=  \
@@ -303,7 +305,8 @@ DEPS_AS_ARGS +=  \
 "hpl/oscctrl/hpl_oscctrl.d" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.d" \
 "samd51a/gcc/gcc/startup_samd51.d" \
-"hpl/sercom/hpl_sercom.d"
+"hpl/sercom/hpl_sercom.d" \
+"pixel.d"
 
 OUTPUT_FILE_NAME :=TapeEmulator
 QUOTE := "
