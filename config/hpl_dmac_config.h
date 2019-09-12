@@ -122,7 +122,7 @@
 // <i> Defines the trigger action used for a transfer
 // <id> dmac_trigact_0
 #ifndef CONF_DMAC_TRIGACT_0
-#define CONF_DMAC_TRIGACT_0 3
+#define CONF_DMAC_TRIGACT_0 2
 #endif
 
 // <o> Trigger source
