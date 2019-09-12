@@ -3311,6 +3311,7 @@ int32_t _spi_m_dma_transfer(struct _spi_m_dma_dev *dev, uint8_t const *txbuf, ui
 		_dma_srcinc_enable(tx_ch, false);
 		_dma_set_data_amount(tx_ch, length);
 	}
+
 	_dma_enable_transaction(tx_ch, false);
 
 	return ERR_NONE;

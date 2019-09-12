@@ -49,13 +49,16 @@ static void TIMER_0_init(void)
 
 void SPI_1_PORT_init(void)
 {
+    // PAD0 is data out (MOSI)
+    // PAD1 is clock
+
     gpio_set_pin_direction(D37, GPIO_DIRECTION_OUT);
     gpio_set_pin_function(D37, PINMUX_PA16C_SERCOM1_PAD0);
-    gpio_set_pin_pull_mode(D37, GPIO_PULL_OFF);
+    gpio_set_pin_pull_mode(D37, GPIO_PULL_DOWN);
 
     gpio_set_pin_direction(D36, GPIO_DIRECTION_OUT);
     gpio_set_pin_function(D36, PINMUX_PA17C_SERCOM1_PAD1);
-    gpio_set_pin_pull_mode(D36, GPIO_PULL_OFF);
+    gpio_set_pin_pull_mode(D36, GPIO_PULL_DOWN);
 
     gpio_set_pin_direction(D35, GPIO_DIRECTION_IN);
     gpio_set_pin_function(D35, PINMUX_PA18C_SERCOM1_PAD2);

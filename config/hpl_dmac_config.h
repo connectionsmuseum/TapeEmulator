@@ -8,7 +8,7 @@
 // <i> Indicates whether dmac is enabled or not
 // <id> dmac_enable
 #ifndef CONF_DMAC_ENABLE
-#define CONF_DMAC_ENABLE 0
+#define CONF_DMAC_ENABLE 1
 #endif
 
 // <q> Priority Level 0
@@ -105,7 +105,7 @@
 // <e> Channel 0 settings
 // <id> dmac_channel_0_settings
 #ifndef CONF_DMAC_CHANNEL_0_SETTINGS
-#define CONF_DMAC_CHANNEL_0_SETTINGS 0
+#define CONF_DMAC_CHANNEL_0_SETTINGS 1
 #endif
 
 // <q> Channel Run in Standby
@@ -122,7 +122,7 @@
 // <i> Defines the trigger action used for a transfer
 // <id> dmac_trigact_0
 #ifndef CONF_DMAC_TRIGACT_0
-#define CONF_DMAC_TRIGACT_0 0
+#define CONF_DMAC_TRIGACT_0 3
 #endif
 
 // <o> Trigger source
@@ -214,7 +214,7 @@
 // <i> Defines the peripheral trigger which is source of the transfer
 // <id> dmac_trifsrc_0
 #ifndef CONF_DMAC_TRIGSRC_0
-#define CONF_DMAC_TRIGSRC_0 0
+#define CONF_DMAC_TRIGSRC_0 0x07
 #endif
 
 // <o> Channel Arbitration Level
@@ -329,7 +329,7 @@
 // <e> Channel 1 settings
 // <id> dmac_channel_1_settings
 #ifndef CONF_DMAC_CHANNEL_1_SETTINGS
-#define CONF_DMAC_CHANNEL_1_SETTINGS 0
+#define CONF_DMAC_CHANNEL_1_SETTINGS 1
 #endif
 
 // <q> Channel Run in Standby
@@ -346,7 +346,7 @@
 // <i> Defines the trigger action used for a transfer
 // <id> dmac_trigact_1
 #ifndef CONF_DMAC_TRIGACT_1
-#define CONF_DMAC_TRIGACT_1 0
+#define CONF_DMAC_TRIGACT_1 3
 #endif
 
 // <o> Trigger source
@@ -438,7 +438,7 @@
 // <i> Defines the peripheral trigger which is source of the transfer
 // <id> dmac_trifsrc_1
 #ifndef CONF_DMAC_TRIGSRC_1
-#define CONF_DMAC_TRIGSRC_1 0
+#define CONF_DMAC_TRIGSRC_1 0x07
 #endif
 
 // <o> Channel Arbitration Level

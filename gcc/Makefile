@@ -35,7 +35,6 @@ usb/class/cdc/device \
 hpl/ramecc \
 hpl/evsys \
 sd_mmc \
-examples \
 hpl/oscctrl \
 hpl/sdhc \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source \
@@ -108,7 +107,6 @@ hal/src/hal_usb_device.o \
 rtos_start.o \
 hpl/osc32kctrl/hpl_osc32kctrl.o \
 hpl/rtc/hpl_rtc.o \
-examples/driver_examples.o \
 driver_init.o \
 usb/class/msc/device/mscdf.o \
 hal/src/hal_ext_irq.o \
@@ -172,7 +170,6 @@ OBJS_AS_ARGS +=  \
 "rtos_start.o" \
 "hpl/osc32kctrl/hpl_osc32kctrl.o" \
 "hpl/rtc/hpl_rtc.o" \
-"examples/driver_examples.o" \
 "driver_init.o" \
 "usb/class/msc/device/mscdf.o" \
 "hal/src/hal_ext_irq.o" \
@@ -194,7 +191,6 @@ OBJS_AS_ARGS +=  \
 DIR_INCLUDES +=  \
 -I"../" \
 -I"../config" \
--I"../examples" \
 -I"../hal/include" \
 -I"../hal/utils/include" \
 -I"../hpl/cmcc" \
@@ -288,7 +284,6 @@ DEPS_AS_ARGS +=  \
 "driver_init.d" \
 "hpl/osc32kctrl/hpl_osc32kctrl.d" \
 "rtos_start.d" \
-"examples/driver_examples.d" \
 "hpl/rtc/hpl_rtc.d" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/list.d" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/queue.d" \

@@ -18,16 +18,18 @@ static void *const delay_hw;
 
 void send_pixel_bit(int x) {
 
-    /* These worked once, but mysterously stopped.
+    /* These worked once, but mysterously stopped. */
     uint16_t cycles_080 = 8;
     uint16_t cycles_085 = 9;
     uint16_t cycles_040 = 3;
     uint16_t cycles_045 = 4;
-    */
+
+    /*
     uint16_t cycles_080 = 20;
     uint16_t cycles_085 = 21;
     uint16_t cycles_040 = 8;
     uint16_t cycles_045 = 9;
+    */
 
     CRITICAL_SECTION_ENTER();
     if(x == 1) {
@@ -98,7 +100,7 @@ static void TIMER_0_fast_pixel_cb(const struct timer_task *const timer_task)
 }
 
 
-void TIMER_LED(void)
+void TIMER_LED_init(void)
 {
     // Timer ticks are ~1ms, see in config/hpl_rtc_config.h
     TIMER_0_task1.interval = 250;

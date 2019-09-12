@@ -12,6 +12,8 @@
 bool d13_state = false;
 int tape_state = STATE_IDLE;
 
+bool dma_finished = false;
+
 
 void update_state() {
     if (gpio_get_pin_level(PIN_FORWARD)) {
@@ -27,13 +29,30 @@ void update_state() {
     }
 }
 
+static uint8_t example_SPI_1[12] = "Hello World!";
+
+static void tx_complete_cb_SPI_1(struct _dma_resource *resource)
+{
+    /* Transfer completed */
+    dma_finished = true;
+}
+
+void SPI_1_example(void)
+{
+    struct io_descriptor *io;
+    spi_m_dma_get_io_descriptor(&SPI_1, &io);
+
+    spi_m_dma_register_callback(&SPI_1, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_1);
+    spi_m_dma_enable(&SPI_1);
+    io_write(io, example_SPI_1, 12);
+}
 
 int main(void)
 {
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
 
-    TIMER_LED();
+    // TIMER_LED_init();
 
     // hri_portgroup_set_PINCFG_PMUXEN_bit(PORT->Group[GPIO_PORTB], 14);
     // hri_portgroup_set_PMUX_PMUXE_bf(PORT->Group[GPIO_PORTB], 14, );
@@ -48,6 +67,9 @@ int main(void)
     gpio_set_pin_function(D11, MUX_PB23M_GCLK_IO1);
     gpio_set_pin_function(PCC_D0, MUX_PA16M_GCLK_IO2);
     */
+
+    delay_ms(20);
+    SPI_1_example();
 
     while(1) {
         update_state();
