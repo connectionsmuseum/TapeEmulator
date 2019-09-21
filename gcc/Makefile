@@ -39,6 +39,7 @@ hpl/oscctrl \
 hpl/sdhc \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0 \
+hpl/tc \
 hpl/osc32kctrl \
 usb \
 hpl/dmac \
@@ -120,6 +121,7 @@ hpl/dmac/hpl_dmac.o \
 sd_mmc/sd_mmc.o \
 atmel_start.o \
 usb/device/usbdc.o \
+hpl/tc/hpl_tc.o \
 hpl/cmcc/hpl_cmcc.o \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o \
 pixel.o
@@ -183,6 +185,7 @@ OBJS_AS_ARGS +=  \
 "sd_mmc/sd_mmc.o" \
 "atmel_start.o" \
 "usb/device/usbdc.o" \
+"hpl/tc/hpl_tc.o" \
 "hpl/cmcc/hpl_cmcc.o" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o" \
 "pixel.o"
@@ -208,6 +211,7 @@ DIR_INCLUDES +=  \
 -I"../hpl/rtc" \
 -I"../hpl/sdhc" \
 -I"../hpl/sercom" \
+-I"../hpl/tc" \
 -I"../hpl/usb" \
 -I"../hri" \
 -I"../" \
@@ -297,6 +301,7 @@ DEPS_AS_ARGS +=  \
 "hal/src/hal_atomic.d" \
 "sd_mmc/sd_mmc.d" \
 "usb/device/usbdc.d" \
+"hpl/tc/hpl_tc.d" \
 "hpl/oscctrl/hpl_oscctrl.d" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.d" \
 "samd51a/gcc/gcc/startup_samd51.d" \
@@ -340,7 +345,7 @@ $(OUTPUT_FILE_PATH): $(OBJS)
 	"arm-none-eabi-objdump" -h -S "$(OUTPUT_FILE_NAME).elf" > "$(OUTPUT_FILE_NAME).lss"
 	"arm-none-eabi-size" "$(OUTPUT_FILE_NAME).elf"
 
-	
+
 
 # Compiler targets
 

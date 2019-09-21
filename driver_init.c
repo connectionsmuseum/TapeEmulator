@@ -14,6 +14,7 @@
 #include <hpl_rtc_base.h>
 
 struct timer_descriptor      TIMER_0;
+struct timer_descriptor      TIMER_1;
 struct spi_m_sync_descriptor SPI_0;
 
 struct spi_m_dma_descriptor SPI_1;
@@ -45,6 +46,16 @@ static void TIMER_0_init(void)
 {
 	hri_mclk_set_APBAMASK_RTC_bit(MCLK);
 	timer_init(&TIMER_0, RTC, _rtc_get_timer());
+}
+
+static void TIMER_1_init(void)
+{
+    
+       // Setup TIMER 1 to pull from GCLK 1, 48MHz
+       hri_mclk_set_APBAMASK_TC0_bit(MCLK);
+       hri_gclk_write_PCHCTRL_reg(GCLK, TC0_GCLK_ID, CONF_GCLK_TC0_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+
+       timer_init(&TIMER_1, TC0, _tc_get_timer());
 }
 
 void SPI_1_PORT_init(void)
@@ -629,7 +640,7 @@ void system_init(void)
 	EVENT_SYSTEM_0_init();
 
 	TIMER_0_init();
-
+        TIMER_1_init();
 	// SPI_0_init();
 
         SPI_1_init();
