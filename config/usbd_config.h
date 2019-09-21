@@ -96,7 +96,7 @@
 // <e> Enable string descriptor of iProduct
 // <id> usb_composite_iproduct_en
 #ifndef CONF_USB_COMPOSITE_IPRODUCT_EN
-#define CONF_USB_COMPOSITE_IPRODUCT_EN 0
+#define CONF_USB_COMPOSITE_IPRODUCT_EN 1
 #endif
 
 #ifndef CONF_USB_COMPOSITE_IPRODUCT
@@ -107,7 +107,7 @@
 // <s> Unicode string of iProduct
 // <id> usb_composite_iproduct_str
 #ifndef CONF_USB_COMPOSITE_IPRODUCT_STR
-#define CONF_USB_COMPOSITE_IPRODUCT_STR "Composite Demo"
+#define CONF_USB_COMPOSITE_IPRODUCT_STR "TapeEmulator"
 #endif
 
 #ifndef CONF_USB_COMPOSITE_IPRODUCT_STR_DESC
@@ -157,7 +157,7 @@
 // <e> Enable string descriptor of iConfig
 // <id> usb_composite_iconfig_en
 #ifndef CONF_USB_COMPOSITE_ICONFIG_EN
-#define CONF_USB_COMPOSITE_ICONFIG_EN 0
+#define CONF_USB_COMPOSITE_ICONFIG_EN 1
 #endif
 
 #ifndef CONF_USB_COMPOSITE_ICONFIG
@@ -170,7 +170,7 @@
 // <s> Unicode string of iConfig
 // <id> usb_composite_iconfig_str
 #ifndef CONF_USB_COMPOSITE_ICONFIG_STR
-#define CONF_USB_COMPOSITE_ICONFIG_STR ""
+#define CONF_USB_COMPOSITE_ICONFIG_STR "TapeEmulator"
 #endif
 
 #ifndef CONF_USB_COMPOSITE_ICONFIG_STR_DESC
@@ -199,7 +199,7 @@
 // <e> CDC ACM Support
 // <id> usb_composite_cdc_acm_support
 #ifndef CONF_USB_COMPOSITE_CDC_ACM_EN
-#define CONF_USB_COMPOSITE_CDC_ACM_EN 0
+#define CONF_USB_COMPOSITE_CDC_ACM_EN 1
 #endif
 
 // <o> CDC ACM Comm Interrupt IN Endpoint Address

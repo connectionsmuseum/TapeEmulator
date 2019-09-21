@@ -132,6 +132,7 @@ void SPI_1_example(void)
 
 int main(void)
 {
+    char usb_printbuf[100];
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
 
@@ -163,12 +164,17 @@ int main(void)
     timer_add_task(&TIMER_1, &TIMER_1_task1);
     timer_start(&TIMER_1);
 
-    //composite_device_start();
+    composite_device_start();
 
     while(1) {
         delay_ms(1000);
         flash_pin(D13, &d13_state);
         // Print some status to USB.
+        if (cdcdf_acm_is_enabled()) {
+            snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i.\n\r",
+                     tape_state, track, (int) dma_running, tape_position);
+            cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+        }
     }
 
     /*
