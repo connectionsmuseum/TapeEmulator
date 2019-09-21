@@ -11,12 +11,15 @@
 
 #include "main.h"
 
+bool d12_state = false;
 bool d13_state = false;
 int tape_state = STATE_IDLE;
 int tape_position = 0;
 int track = 0;
 
 bool dma_running = false;
+
+static struct timer_task TIMER_1_task1;
 
 static uint8_t example_SPI_1[12] = "Hello World!";
 
@@ -50,11 +53,20 @@ void update_state() {
     }
 }
 
-void tick() {
+void tick(const struct timer_task *const timer_task) {
 
     int block_id;
 
     update_state();
+
+    // Only to debug ticking.
+    if(d12_state) {
+	gpio_set_pin_level(D12, true);
+        d13_state = false;
+    } else {
+	gpio_set_pin_level(D12, false);
+        d12_state = true;
+    }
 
     if(tape_state == STATE_FORWARD) {
         // Check if DMA is active, else start
@@ -135,15 +147,23 @@ int main(void)
     gpio_set_pin_function(PCC_D0, MUX_PA16M_GCLK_IO2);
     */
 
-    delay_ms(20);
+    delay_ms(50);
     SPI_1_example();
+    delay_ms(50);
 
-    while(1) {
-        update_state();
-        delay_ms(10);
-    }
+    // interval is in terms of 100 microseconds, see CONF_TC0_TIMER_TICK
+    TIMER_1_task1.interval = 25;
+    TIMER_1_task1.cb       = tick;
+    TIMER_1_task1.mode     = TIMER_TASK_REPEAT;
+    timer_add_task(&TIMER_1, &TIMER_1_task1);
+    timer_start(&TIMER_1);
 
     //composite_device_start();
+
+    while(1) {
+        delay_ms(1000);
+        // Print some status to USB.
+    }
 
     /*
     xTaskCreate(blinkTask, "BlinkTask", 200,
