@@ -53,6 +53,16 @@ void update_state() {
     }
 }
 
+void flash_pin(const uint8_t pin, bool *state_variable) {
+    if(*state_variable) {
+	gpio_set_pin_level(pin, true);
+        *state_variable = false;
+    } else {
+	gpio_set_pin_level(pin, false);
+        *state_variable = true;
+    }
+}
+
 void tick(const struct timer_task *const timer_task) {
 
     int block_id;
@@ -60,13 +70,7 @@ void tick(const struct timer_task *const timer_task) {
     update_state();
 
     // Only to debug ticking.
-    if(d12_state) {
-	gpio_set_pin_level(D12, true);
-        d13_state = false;
-    } else {
-	gpio_set_pin_level(D12, false);
-        d12_state = true;
-    }
+    flash_pin(D12, &d12_state);
 
     if(tape_state == STATE_FORWARD) {
         // Check if DMA is active, else start
@@ -147,6 +151,7 @@ int main(void)
     gpio_set_pin_function(PCC_D0, MUX_PA16M_GCLK_IO2);
     */
 
+
     delay_ms(50);
     SPI_1_example();
     delay_ms(50);
@@ -162,6 +167,7 @@ int main(void)
 
     while(1) {
         delay_ms(1000);
+        flash_pin(D13, &d13_state);
         // Print some status to USB.
     }
 
