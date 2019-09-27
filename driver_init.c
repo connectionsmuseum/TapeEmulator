@@ -574,6 +574,9 @@ void system_init(void)
 
 	gpio_set_pin_function(D12, GPIO_PIN_FUNCTION_OFF);
 
+	gpio_set_pin_direction(D10, GPIO_DIRECTION_OUT);
+	gpio_set_pin_function(D10, GPIO_PIN_FUNCTION_OFF);
+
 	// GPIO on PB01
 
 	gpio_set_pin_level(D13,
