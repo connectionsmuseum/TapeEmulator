@@ -6,6 +6,7 @@
 #include "task.h"
 #include "timers.h"
 #include "fatFS/ff.h"
+#include "usb/class/msc/spc_protocol.h"
 
 #include "pixel.h"
 #include "tape_states.h"
@@ -131,6 +132,138 @@ void SPI_1_example(void)
     dma_running = true;
 }
 
+/* Inquiry Information */
+// This is designed to handle the common case where we have an internal file
+// system and an optional SD card.
+// COMPILER_ALIGNED(4) static uint8_t inquiry_info[2][36];
+COMPILER_ALIGNED(4) static struct scsi_inquiry_data inquiry_info;
+
+/* Capacities of Disk */
+COMPILER_ALIGNED(4) static uint8_t format_capa[2][8];
+
+int32_t this_mscdf_read_disk(uint8_t lun, uint8_t address, uint8_t nblocks) {
+    if (lun > 1) {
+        return ERR_NOT_FOUND;
+    }
+
+    return 0;
+}
+
+int32_t this_mscdf_test_disk_ready_t(uint8_t lun) {
+    if (lun > 1) {
+        return ERR_NOT_FOUND;
+    }
+    // I think ERR_NONE is a good thing.
+    return ERR_NONE;
+}
+
+
+uint8_t *this_mscdf_get_disk_capacity_t(uint8_t lun) {
+    uint32_t last_valid_sector = 2000;
+    uint32_t sector_size = 8; // No idea what this means
+
+    if (lun > 1) {
+        return NULL;
+    }
+    // https://github.com/tuupola/circuitpython/blob/master/ports/atmel-samd/usb_mass_storage.c#L154
+    // "8 byte response. First 4 bytes are last block address. Second 4
+    // bytes are sector size."
+    format_capa[lun][0] = (uint8_t)(last_valid_sector >> 24);
+    format_capa[lun][1] = (uint8_t)(last_valid_sector >> 16);
+    format_capa[lun][2] = (uint8_t)(last_valid_sector >> 8);
+    format_capa[lun][3] = (uint8_t)(last_valid_sector >> 0);
+    format_capa[lun][4] = (uint8_t)(sector_size >> 24);
+    format_capa[lun][5] = (uint8_t)(sector_size >> 16);
+    format_capa[lun][6] = (uint8_t)(sector_size >> 8);
+    format_capa[lun][7] = (uint8_t)(sector_size >> 0);
+
+    return &format_capa[lun][0];
+    
+}
+
+uint8_t *usb_msc_inquiry_info(uint8_t lun) {
+    if (lun > 1) {
+        return NULL;
+    } 
+    inquiry_info.pq_pdt = SCSI_INQ_PQ_CONNECTED | SCSI_INQ_DT_DIR_ACCESS;
+    inquiry_info.flags1 = SCSI_INQ_RMB;
+    inquiry_info.version = SCSI_INQ_VER_SPC;
+    inquiry_info.flags3 = SCSI_INQ_RSP_SPC2;
+    inquiry_info.addl_len = 0;
+    inquiry_info.flags5 = 0;
+    inquiry_info.flags6 = 0;
+    inquiry_info.flags7 = 0;
+    inquiry_info.vendor_id[0] = 0x10;
+    inquiry_info.vendor_id[1] = 0x20;
+    inquiry_info.vendor_id[2] = 0x30;
+    inquiry_info.product_id[0] = "T";
+    inquiry_info.product_id[1] = "a";
+    inquiry_info.product_id[2] = "p";
+    inquiry_info.product_id[3] = "e";
+    inquiry_info.product_rev[0] = 0x01;
+    return &inquiry_info;
+
+#if 0
+else {
+        for (uint8_t i = 0; i < 36; i++) {
+            inquiry_info[lun][i] = 0;
+        }
+        inquiry_info[lun][0] = SCSI_INQ_PQ_CONNECTED | SCSI_INQ_DT_DIR_ACCESS;
+                               // connected, direct access
+        inquiry_info[lun][1] = SCSI_INQ_RMB;     // removable medium
+        inquiry_info[lun][2] = SCSI_INQ_VER_SPC; // SBC version of SCSI primary commands
+        inquiry_info[lun][3] = SCSI_INQ_RSP_SPC2;// SPC-2 response format
+        inquiry_info[lun][4] = 31;               // 31 bytes following
+        return &inquiry_info[lun][0];
+    }
+#endif
+}
+
+// USB transfer state.
+volatile bool usb_busy;
+volatile bool active_read;
+volatile bool active_write;
+volatile uint8_t active_lun;
+volatile uint32_t active_addr;
+volatile uint32_t active_nblocks;
+volatile bool sector_loaded;
+COMPILER_ALIGNED(4) uint8_t sector_buffer[512];
+
+int32_t usb_msc_new_read(uint8_t lun, uint32_t addr, uint32_t nblocks) {
+    if (lun > 1) {
+        return ERR_NOT_FOUND;
+    }
+
+    // Store transfer info so we can service it in the "background".
+    active_lun = lun;
+    active_addr = addr;
+    active_nblocks = nblocks;
+    active_read = true;
+
+    return ERR_NONE;
+}
+
+void usb_msc_background(void) {
+    if (active_read && !usb_busy) {
+        if (active_nblocks == 0) {
+            active_read = false;
+            return;
+        }
+        // fs_user_mount_t * vfs = get_vfs(active_lun);
+        // disk_read(vfs, sector_buffer, active_addr, 1);
+        CRITICAL_SECTION_ENTER();
+        int32_t result = mscdf_xfer_blocks(true, sector_buffer, 1);
+        usb_busy = result == ERR_NONE;
+        CRITICAL_SECTION_LEAVE();
+    }
+}
+int32_t usb_msc_disk_is_writable(uint8_t lun) {
+    if (lun > 1) {
+        return ERR_NOT_FOUND;
+    }
+    return ERR_DENIED;
+}
+
 int main(void)
 {
     char usb_printbuf[100];
@@ -141,6 +274,9 @@ int main(void)
 
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
+
+    gpio_set_pin_level(D10, true);
+
 
     // TIMER_LED_init();
 
@@ -169,6 +305,22 @@ int main(void)
     TIMER_1_task1.mode     = TIMER_TASK_REPEAT;
     timer_add_task(&TIMER_1, &TIMER_1_task1);
     timer_start(&TIMER_1);
+
+    /* 
+     * In the macos console, this is the device:
+     * USBMSC Identifier (non-unique): 0x3eb 0x2421 0x100
+     */
+
+    // mscdf_register_callback(enum mscdf_cb_type cb_type, FUNC_PTR func)
+    /*
+    mscdf_register_callback(MSCDF_CB_GET_DISK_CAPACITY, (FUNC_PTR)this_mscdf_get_disk_capacity_t);
+    mscdf_register_callback(MSCDF_CB_TEST_DISK_READY, (FUNC_PTR)this_mscdf_test_disk_ready_t);
+    mscdf_register_callback(MSCDF_CB_START_READ_DISK, (FUNC_PTR)this_mscdf_read_disk);
+    mscdf_register_callback(MSCDF_CB_INQUIRY_DISK, (FUNC_PTR)usb_msc_inquiry_info);
+    mscdf_register_callback(MSCDF_CB_START_READ_DISK, (FUNC_PTR)usb_msc_new_read);
+    // mscdf_register_callback(MSCDF_CB_IS_WRITABLE, (FUNC_PTR)usb_msc_disk_is_writable);
+    memset(sector_buffer, 0, 512);
+    */
 
     composite_device_start();
 

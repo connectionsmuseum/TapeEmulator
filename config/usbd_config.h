@@ -520,7 +520,7 @@
 // <e> MSC Support
 // <id> usb_composite_msc_support
 #ifndef CONF_USB_COMPOSITE_MSC_EN
-#define CONF_USB_COMPOSITE_MSC_EN 0
+#define CONF_USB_COMPOSITE_MSC_EN 1
 #endif
 
 // <o> MSC BULK Endpoints wMaxPacketSize
@@ -583,7 +583,7 @@
 // <e> Enable Demo code for Disk LUN handling
 // <id> usb_composite_msc_demo_en
 #ifndef CONF_USB_COMPOSITE_MSC_LUN_DEMO
-#define CONF_USB_COMPOSITE_MSC_LUN_DEMO 1
+#define CONF_USB_COMPOSITE_MSC_LUN_DEMO 0
 #endif
 
 // <o> Disk access cache/buffer of sectors if non-RAM disk (e.g., SD/MMC) enabled <1-64>
@@ -595,7 +595,7 @@
 // <e> Enable Demo for RAM Disk
 // <id> conf_usb_msc_lun0_enable
 #ifndef CONF_USB_MSC_LUN0_ENABLE
-#define CONF_USB_MSC_LUN0_ENABLE 1
+#define CONF_USB_MSC_LUN0_ENABLE 0
 #endif
 
 #ifndef CONF_USB_MSC_LUN0_TYPE
