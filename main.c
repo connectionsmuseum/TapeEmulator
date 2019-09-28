@@ -5,6 +5,7 @@
 #include "FreeRTOSConfig.h"
 #include "task.h"
 #include "timers.h"
+#include "fatFS/ff.h"
 
 #include "pixel.h"
 #include "tape_states.h"
@@ -133,6 +134,11 @@ void SPI_1_example(void)
 int main(void)
 {
     char usb_printbuf[100];
+
+    FATFS FatFs;
+    FIL fp;
+    UINT nbytes_read;
+
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
 
@@ -166,6 +172,9 @@ int main(void)
 
     composite_device_start();
 
+    f_mount(&FatFs, "", 0);
+    f_open(&fp, "track0.dat", FA_READ);
+
     while(1) {
         delay_ms(1000);
         flash_pin(D13, &d13_state);
@@ -174,6 +183,14 @@ int main(void)
             snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i.\n\r",
                      tape_state, track, (int) dma_running, tape_position);
             cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+
+            f_read(&fp, usb_printbuf, 5, &nbytes_read);
+
+            usb_printbuf[nbytes_read] = 0x0;
+            cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+
+
+
         }
     }
 

@@ -59,7 +59,8 @@ hpl/mclk \
 usb/class/msc/device \
 hpl/sercom \
 hpl/eic \
-hpl/core
+hpl/core \
+fatFS
 
 # List the object files
 OBJS +=  \
@@ -124,7 +125,9 @@ usb/device/usbdc.o \
 hpl/tc/hpl_tc.o \
 hpl/cmcc/hpl_cmcc.o \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o \
-pixel.o
+pixel.o \
+fatFS/diskio.o \
+fatFS/ff.o
 
 OBJS_AS_ARGS +=  \
 "hal/src/hal_io.o" \
@@ -188,7 +191,9 @@ OBJS_AS_ARGS +=  \
 "hpl/tc/hpl_tc.o" \
 "hpl/cmcc/hpl_cmcc.o" \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o" \
-"pixel.o"
+"pixel.o" \
+"fatFS/diskio.o" \
+"fatFS/ff.o"
 
 # List the directories containing header files
 DIR_INCLUDES +=  \
@@ -239,7 +244,8 @@ DIR_INCLUDES +=  \
 -I"../sd_mmc" \
 -I"../" \
 -I"../CMSIS/Core/Include" \
--I"../samd51a/include"
+-I"../samd51a/include" \
+-I"../fatFS"
 
 # List the dependency files
 DEPS := $(OBJS:%.o=%.d)
@@ -306,7 +312,9 @@ DEPS_AS_ARGS +=  \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.d" \
 "samd51a/gcc/gcc/startup_samd51.d" \
 "hpl/sercom/hpl_sercom.d" \
-"pixel.d"
+"pixel.d" \
+"fatFS/diskio.d" \
+"fatFS/ff.d"
 
 OUTPUT_FILE_NAME :=TapeEmulator
 QUOTE := "
@@ -355,7 +363,7 @@ $(OUTPUT_FILE_PATH): $(OBJS)
 %.o: %.c
 	@echo Building file: $<
 	@echo ARM/GNU C Compiler
-	$(QUOTE)arm-none-eabi-gcc$(QUOTE) -x c -mthumb -DDEBUG -Os -ffunction-sections -mlong-calls -g3 -Wall -c -std=gnu99 \
+	$(QUOTE)arm-none-eabi-gcc$(QUOTE) -x c -mthumb -DDEBUG -ffunction-sections -mlong-calls -g3 -Wall -c -std=gnu99 \
 -D__SAMD51P20A__ -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 \
 $(DIR_INCLUDES) \
 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"  -o "$@" "$<"

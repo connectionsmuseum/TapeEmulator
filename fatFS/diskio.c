@@ -9,12 +9,11 @@
 
 #include "ff.h"			/* Obtains integer types */
 #include "diskio.h"		/* Declarations of disk functions */
+#include "sd_mmc/sd_mmc.h"
 
 /* Definitions of physical drive number for each drive */
-#define DEV_RAM		0	/* Example: Map Ramdisk to physical drive 0 */
-#define DEV_MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
-#define DEV_USB		2	/* Example: Map USB MSD to physical drive 2 */
-
+#define DEV_MMC		0	/* Example: Map MMC/SD card to physical drive 1 */
+#define DEV_FLASH	1
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -28,26 +27,15 @@ DSTATUS disk_status (
 	int result;
 
 	switch (pdrv) {
-	case DEV_RAM :
-		result = RAM_disk_status();
-
-		// translate the result code here
-
-		return stat;
-
 	case DEV_MMC :
-		result = MMC_disk_status();
+		// result = STA_NODISK();
 
 		// translate the result code here
 
-		return stat;
+		return 0;
 
-	case DEV_USB :
-		result = USB_disk_status();
-
-		// translate the result code here
-
-		return stat;
+	case DEV_FLASH :
+		return STA_NOINIT;
 	}
 	return STA_NOINIT;
 }
@@ -66,26 +54,15 @@ DSTATUS disk_initialize (
 	int result;
 
 	switch (pdrv) {
-	case DEV_RAM :
-		result = RAM_disk_initialize();
-
-		// translate the result code here
-
-		return stat;
-
 	case DEV_MMC :
-		result = MMC_disk_initialize();
+		// result = MMC_disk_initialize();
 
 		// translate the result code here
 
-		return stat;
+		return 0;
 
-	case DEV_USB :
-		result = USB_disk_initialize();
-
-		// translate the result code here
-
-		return stat;
+	case DEV_FLASH :
+            return STA_NOINIT;
 	}
 	return STA_NOINIT;
 }
@@ -104,35 +81,27 @@ DRESULT disk_read (
 )
 {
 	DRESULT res;
-	int result;
+        sd_mmc_err_t status;
 
 	switch (pdrv) {
-	case DEV_RAM :
-		// translate the arguments here
-
-		result = RAM_disk_read(buff, sector, count);
-
-		// translate the result code here
-
-		return res;
-
 	case DEV_MMC :
+                /* while (SD_MMC_OK != sd_mmc_check(0)) {
+                        // Wait card ready.
+                } */
+		status = sd_mmc_init_read_blocks(0, sector, count);
+		status = sd_mmc_start_read_blocks(buff, count);
+		status = sd_mmc_wait_end_of_read_blocks(false);
+
+		return RES_OK;
+
+	case DEV_FLASH :
 		// translate the arguments here
 
-		result = MMC_disk_read(buff, sector, count);
+		// result = USB_disk_read(buff, sector, count);
 
 		// translate the result code here
 
-		return res;
-
-	case DEV_USB :
-		// translate the arguments here
-
-		result = USB_disk_read(buff, sector, count);
-
-		// translate the result code here
-
-		return res;
+		return RES_PARERR;
 	}
 
 	return RES_PARERR;
@@ -157,15 +126,6 @@ DRESULT disk_write (
 	int result;
 
 	switch (pdrv) {
-	case DEV_RAM :
-		// translate the arguments here
-
-		result = RAM_disk_write(buff, sector, count);
-
-		// translate the result code here
-
-		return res;
-
 	case DEV_MMC :
 		// translate the arguments here
 
@@ -175,7 +135,7 @@ DRESULT disk_write (
 
 		return res;
 
-	case DEV_USB :
+	case DEV_FLASH :
 		// translate the arguments here
 
 		result = USB_disk_write(buff, sector, count);
@@ -205,23 +165,30 @@ DRESULT disk_ioctl (
 	int result;
 
 	switch (pdrv) {
-	case DEV_RAM :
-
-		// Process of the command for the RAM drive
-
-		return res;
 
 	case DEV_MMC :
+            switch(cmd) {
+                case CTRL_SYNC:
+                    while (SD_MMC_OK != sd_mmc_check(0)) {
+                            /* Wait card ready. */
+                    }
+                    return RES_OK;
 
-		// Process of the command for the MMC/SD card
+                case GET_SECTOR_COUNT:
+                    return RES_ERROR;
 
-		return res;
+                case GET_SECTOR_SIZE:
+                    return SD_MMC_BLOCK_SIZE;
 
-	case DEV_USB :
+                case GET_BLOCK_SIZE:
+                    return RES_ERROR;
+                case CTRL_TRIM:
+                    return RES_ERROR;
+            }
 
+	case DEV_FLASH :
 		// Process of the command the USB drive
-
-		return res;
+		return RES_PARERR;
 	}
 
 	return RES_PARERR;

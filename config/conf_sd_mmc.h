@@ -13,7 +13,7 @@
 // <q> Enable the MMC card support
 // <id> conf_mmc_support
 #ifndef CONF_MMC_SUPPORT
-#define CONF_MMC_SUPPORT 0
+#define CONF_MMC_SUPPORT 1
 #endif
 
 // <q> Enable the OS support
@@ -41,7 +41,7 @@
 // <e> Card Detect (CD) 0 Enable
 // <id> conf_sd_mmc_0_cd_detect_en
 #ifndef CONF_SD_MMC_0_CD_DETECT_EN
-#define CONF_SD_MMC_0_CD_DETECT_EN 0
+#define CONF_SD_MMC_0_CD_DETECT_EN 1
 #endif
 
 // <o> Card Detect (CD) detection level
@@ -49,7 +49,7 @@
 // <0=> Low
 // <id> conf_sd_mmc_0_cd_detect_value
 #ifndef CONF_SD_MMC_0_CD_DETECT_VALUE
-#define CONF_SD_MMC_0_CD_DETECT_VALUE 0
+#define CONF_SD_MMC_0_CD_DETECT_VALUE 1
 #endif
 // </e>
 

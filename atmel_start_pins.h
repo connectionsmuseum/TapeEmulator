@@ -47,6 +47,9 @@
 #define D11 GPIO(GPIO_PORTB, 23)
 #define PCC_D0 GPIO(GPIO_PORTA, 16)
 
+// SD Card detect
+#define PB31 GPIO(GPIO_PORTB, 31)
+
 #define NEOPIX GPIO(GPIO_PORTC, 24)
 
 #define PIN_FORWARD GPIO(GPIO_PORTC, 11) // D44
