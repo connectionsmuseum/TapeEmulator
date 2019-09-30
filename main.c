@@ -131,6 +131,31 @@ void SPI_1_example(void)
     dma_running = true;
 }
 
+uint8_t send_SD_CMD(struct io_descriptor *io, uint8_t cmd, uint32_t arg, uint8_t crc, uint8_t *response) {
+    uint8_t zero = 0;
+    uint8_t formatted_cmd[6];
+    uint8_t buf = 0;
+
+    formatted_cmd[0] = 0x40 | cmd;
+    // memcpy(&formatted_cmd[1], &arg, 4);
+    formatted_cmd[1] = arg >> 24;
+    formatted_cmd[2] = arg >> 16;
+    formatted_cmd[3] = arg >> 8;
+    formatted_cmd[4] = arg;
+    formatted_cmd[5] = crc;
+
+    // gpio_set_pin_level(SD_CS, false);
+    io_write(io, formatted_cmd, 6);
+    io_write(io, &zero, 1);
+    io_read(io, &buf, 1);
+    if(response != NULL) {
+        io_read(io, response, 4);
+    }
+    return buf;
+    // gpio_set_pin_level(SD_CS, true);
+
+}
+
 int main(void)
 {
     char usb_printbuf[100];
@@ -142,9 +167,9 @@ int main(void)
     struct io_descriptor *io;
     uint8_t good;
     uint8_t buf[10];
-    uint8_t cmd0[] = {0x40, 0x0, 0x0, 0x0, 0x0, 0x95 };
     int count = 0;
-    uint8_t zero = 0;
+    uint8_t result;
+    uint8_t response[4];
 
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
@@ -183,6 +208,10 @@ int main(void)
 
     while(true) {
         delay_ms(2);
+        //
+        // SD card initialization cribbed from:
+        // https://electronics.stackexchange.com/questions/77417
+        //
 
         baud_register = 119;
         spi_m_sync_disable(&SPI_2);
@@ -201,19 +230,39 @@ int main(void)
 
         // OK, now going to put the card into SPI mode.
         // Send CMD0
+        gpio_set_pin_level(SD_CS, false);
         count = 0;
-        while((buf[0] != 0x01) && (count < 100)) {
-            memset(buf, 0x00, 10);
-            gpio_set_pin_level(SD_CS, false);
-            io_write(io, cmd0, 6);
-            io_write(io, &zero, 1);
-            io_read(io, buf, 6);
-            gpio_set_pin_level(SD_CS, true);
-            count += 1;
+        result = send_SD_CMD(io, 0, 0x0, 0x95, NULL);
+        while((result != 0x01) && (count < 100)) {
             delay_ms(1);
+            count += 1;
+            result = send_SD_CMD(io, 0x0, 0x0, 0x95, NULL);
         }
 
-        good = buf[0];
+        result = send_SD_CMD(io, 8, 0x000001AA, 0x87, response);
+
+        if(result != 0x01) {
+            delay_ms(10);
+            continue;
+        }
+
+        // CMD55, ACMD41 apparently need to be repeated some times.
+        count = 0;
+        do {
+            count += 1;
+            result = send_SD_CMD(io, 55, 0x0, 0x0, response);
+
+            if(result == 0x05) {
+                // SD Card is old style, support not implemented.
+                // Meant to be an infinite loop.
+                while(true) {
+                    snprintf(usb_printbuf, 99, "SD Card is unsupported.");
+                    cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+                    delay_ms(5000);
+                }
+            }
+            result = send_SD_CMD(io, 41, 0x40000000, 0x0, response);
+        } while(result != 0x0);
     }
 
     f_mount(&FatFs, "", 0);
