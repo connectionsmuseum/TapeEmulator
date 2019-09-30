@@ -40,6 +40,7 @@ extern struct timer_descriptor      TIMER_0;
 extern struct spi_m_sync_descriptor SPI_0;
 
 extern struct spi_m_dma_descriptor SPI_1;
+extern struct spi_m_sync_descriptor SPI_2;
 
 extern struct mci_sync_desc IO_BUS;
 
@@ -52,6 +53,10 @@ void SPI_0_init(void);
 void SPI_1_PORT_init(void);
 void SPI_1_CLOCK_init(void);
 void SPI_1_init(void);
+
+void SPI_2_PORT_init(void);
+void SPI_2_CLOCK_init(void);
+void SPI_2_init(void);
 
 void IO_BUS_PORT_init(void);
 void IO_BUS_CLOCK_init(void);

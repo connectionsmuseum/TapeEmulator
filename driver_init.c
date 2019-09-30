@@ -16,8 +16,11 @@
 struct timer_descriptor      TIMER_0;
 struct timer_descriptor      TIMER_1;
 struct spi_m_sync_descriptor SPI_0;
-
+// Data out to 3ESS
 struct spi_m_dma_descriptor SPI_1;
+// SD Card SERCOM
+struct spi_m_sync_descriptor SPI_2;
+
 
 struct mci_sync_desc IO_BUS;
 
@@ -121,6 +124,50 @@ void SPI_0_PORT_init(void)
 	                       GPIO_PULL_OFF);
 
 	gpio_set_pin_function(PA06, PINMUX_PA06D_SERCOM0_PAD2);
+}
+
+void SPI_2_PORT_init(void)
+{
+
+       // SD MOSI
+       gpio_set_pin_level(PB26, false);
+       gpio_set_pin_direction(PB26, GPIO_DIRECTION_OUT);
+       gpio_set_pin_function(PB26, PINMUX_PB26C_SERCOM2_PAD0);
+
+       // SD CLK
+       // Set pin direction to output
+       gpio_set_pin_direction(PB27, GPIO_DIRECTION_OUT);
+       gpio_set_pin_level(PB27, false);
+       gpio_set_pin_function(PB27, PINMUX_PB27C_SERCOM2_PAD1);
+
+       // SD MISO
+       gpio_set_pin_direction(PB29, GPIO_DIRECTION_IN);
+       gpio_set_pin_pull_mode(PB29, GPIO_PULL_UP);
+       gpio_set_pin_function(PB29, PINMUX_PB29C_SERCOM2_PAD3);
+
+       // SD CS
+       gpio_set_pin_direction(SD_CS, GPIO_DIRECTION_OUT);
+       // gpio_set_pin_pull_mode(SD_CS, GPIO_PULL_OFF);
+       
+       // Guessing:
+       // gpio_set_pin_pull_mode(SD_CS, GPIO_PULL_UP);
+       // gpio_set_pin_pull_mode(PB26, GPIO_PULL_UP);
+       // gpio_set_pin_pull_mode(PB27, GPIO_PULL_UP);
+}
+
+void SPI_2_CLOCK_init(void)
+{
+       hri_gclk_write_PCHCTRL_reg(GCLK, SERCOM2_GCLK_ID_CORE, CONF_GCLK_SERCOM2_CORE_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+       hri_gclk_write_PCHCTRL_reg(GCLK, SERCOM2_GCLK_ID_SLOW, CONF_GCLK_SERCOM2_SLOW_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+
+       hri_mclk_set_APBBMASK_SERCOM2_bit(MCLK);
+}
+
+void SPI_2_init(void)
+{
+       SPI_2_CLOCK_init();
+       spi_m_sync_init(&SPI_2, SERCOM2);
+       SPI_2_PORT_init();
 }
 
 void SPI_0_CLOCK_init(void)
@@ -647,6 +694,7 @@ void system_init(void)
 	// SPI_0_init();
 
         SPI_1_init();
+        SPI_2_init();
 
 	IO_BUS_init();
 

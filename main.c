@@ -5,10 +5,10 @@
 #include "FreeRTOSConfig.h"
 #include "task.h"
 #include "timers.h"
-#include "fatFS/ff.h"
 
 #include "pixel.h"
 #include "tape_states.h"
+#include "fatFS/ff.h"
 
 #include "main.h"
 
@@ -134,10 +134,17 @@ void SPI_1_example(void)
 int main(void)
 {
     char usb_printbuf[100];
-
     FATFS FatFs;
     FIL fp;
-    UINT nbytes_read;
+    unsigned int nbytes_read;
+    int ret;
+    uint32_t baud_register;
+    struct io_descriptor *io;
+    uint8_t good;
+    uint8_t buf[10];
+    uint8_t cmd0[] = {0x40, 0x0, 0x0, 0x0, 0x0, 0x95 };
+    int count = 0;
+    uint8_t zero = 0;
 
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
@@ -159,18 +166,55 @@ int main(void)
     */
 
 
+    /*
     delay_ms(50);
     SPI_1_example();
     delay_ms(50);
+    */
 
     // interval is in terms of 100 microseconds, see CONF_TC0_TIMER_TICK
     TIMER_1_task1.interval = 25;
     TIMER_1_task1.cb       = tick;
     TIMER_1_task1.mode     = TIMER_TASK_REPEAT;
     timer_add_task(&TIMER_1, &TIMER_1_task1);
-    timer_start(&TIMER_1);
+    // timer_start(&TIMER_1);
 
     composite_device_start();
+
+    while(true) {
+        delay_ms(2);
+
+        baud_register = 119;
+        spi_m_sync_disable(&SPI_2);
+        spi_m_sync_set_baudrate(&SPI_2, baud_register);
+        spi_m_sync_enable(&SPI_2);
+
+        spi_m_sync_get_io_descriptor(&SPI_2, &io);
+
+        gpio_set_pin_function(PB26, GPIO_PIN_FUNCTION_OFF);
+        gpio_set_pin_level(SD_CS, true);
+        gpio_set_pin_level(PB26, true);
+        // memset(buf, 0x00, 10);
+        io_read(io, buf, 10);
+        gpio_set_pin_function(PB26, PINMUX_PB26C_SERCOM2_PAD0);
+
+
+        // OK, now going to put the card into SPI mode.
+        // Send CMD0
+        count = 0;
+        while((buf[0] != 0x01) && (count < 100)) {
+            memset(buf, 0x00, 10);
+            gpio_set_pin_level(SD_CS, false);
+            io_write(io, cmd0, 6);
+            io_write(io, &zero, 1);
+            io_read(io, buf, 6);
+            gpio_set_pin_level(SD_CS, true);
+            count += 1;
+            delay_ms(1);
+        }
+
+        good = buf[0];
+    }
 
     f_mount(&FatFs, "", 0);
     f_open(&fp, "track0.dat", FA_READ);
@@ -185,7 +229,6 @@ int main(void)
             cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
 
             f_read(&fp, usb_printbuf, 5, &nbytes_read);
-
             usb_printbuf[nbytes_read] = 0x0;
             cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
 
