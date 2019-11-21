@@ -16,7 +16,9 @@ bool d12_state = false;
 bool d13_state = false;
 int tape_state = STATE_IDLE;
 int tape_position = 0;
-int track = 0;
+int read_track = 0;
+int write_track = 0;
+int MAX_TRACK_POSITION = 100000; // TODO: set this properly
 
 bool dma_running = false;
 
@@ -24,27 +26,35 @@ static struct timer_task TIMER_1_task1;
 
 static uint8_t example_SPI_1[12] = "Hello World!";
 
+static inline bool get_pin_active_low(const uint8_t pin) {
+    return !gpio_get_pin_level(pin);
+}
+
+static inline void set_pin_active_low(const uint8_t pin, const bool level) {
+    gpio_set_pin_level(pin, !level);
+}
+
 void update_state() {
     int normal_speed = 10;
     int fast_speed = 50;
     int previous_tape_state = tape_state;
 
-    if (gpio_get_pin_level(PIN_FORWARD)) {
+    if (get_pin_active_low(TTSF0)) {
         tape_state = STATE_FORWARD;
         if(previous_tape_state == STATE_FORWARD) {
             tape_position += normal_speed;
         }
-    } else if (gpio_get_pin_level(PIN_FF)) {
+    } else if (get_pin_active_low(TTFF0)) {
         tape_state = STATE_FF;
         if(previous_tape_state == STATE_FF) {
             tape_position += fast_speed;
         }
-    } else if (gpio_get_pin_level(PIN_REV)) {
+    } else if (get_pin_active_low(TTSR0)) {
         tape_state = STATE_REV;
         if(previous_tape_state == STATE_REV) {
             tape_position -= normal_speed;
         }
-    } else if (gpio_get_pin_level(PIN_FR)) {
+    } else if (get_pin_active_low(TTFR0)) {
         tape_state = STATE_FR;
         if(previous_tape_state == STATE_FR) {
             tape_position -= fast_speed;
@@ -52,6 +62,31 @@ void update_state() {
     } else {
         tape_state = STATE_IDLE;
     }
+
+    if(tape_position <= 0) {
+        tape_position = 0;
+        set_pin_active_low(TTBOTA0, true);
+    } else {
+        set_pin_active_low(TTBOTA0, false);
+
+    }
+
+    if(tape_position >= MAX_TRACK_POSITION) {
+        tape_position = MAX_TRACK_POSITION;
+        set_pin_active_low(TTEOTA0, true);
+    } else {
+        set_pin_active_low(TTEOTA0, false);
+
+    }
+
+    if(!dma_running) {
+        read_track = (get_pin_active_low(RTA10)*2 +
+                      get_pin_active_low(RTA00)*1);
+
+        write_track = (get_pin_active_low(WTA10)*2 +
+                       get_pin_active_low(WTA00)*1);
+    }
+
 }
 
 void flash_pin(const uint8_t pin, bool *state_variable) {
@@ -152,26 +187,6 @@ int main(void)
 
     // TIMER_LED_init();
 
-    // hri_portgroup_set_PINCFG_PMUXEN_bit(PORT->Group[GPIO_PORTB], 14);
-    // hri_portgroup_set_PMUX_PMUXE_bf(PORT->Group[GPIO_PORTB], 14, );
-
-    // Possible combinations are listed in samd51a/include/pio/samd51p20a.h
-    // PB22 -> D10, PINMUX_PB22M_GCLK_IO0
-    // PB23 -> D11, PINMUX_PB23M_GCLK_IO1
-
-    /*
-    gpio_set_pin_direction(D11, GPIO_DIRECTION_OUT);
-    gpio_set_pin_pull_mode(D11, GPIO_PULL_DOWN);
-    gpio_set_pin_function(D11, MUX_PB23M_GCLK_IO1);
-    gpio_set_pin_function(PCC_D0, MUX_PA16M_GCLK_IO2);
-    */
-
-
-    /*
-    delay_ms(50);
-    SPI_1_example();
-    delay_ms(50);
-    */
 
     // interval is in terms of 100 microseconds, see CONF_TC0_TIMER_TICK
     TIMER_1_task1.interval = 25;
@@ -192,8 +207,8 @@ int main(void)
         flash_pin(D13, &d13_state);
         // Print some status to USB.
         if (cdcdf_acm_is_enabled()) {
-            snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i.\n\r",
-                     tape_state, track, (int) dma_running, tape_position);
+            snprintf(usb_printbuf, 99, "State: %i, RD Track %i, DMA: %i, Position: %i.\n\r",
+                     tape_state, read_track, (int) dma_running, tape_position);
             cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
 
             if(!f_eof(&fp)) {
@@ -204,20 +219,9 @@ int main(void)
         }
     }
 
-    /*
-    xTaskCreate(blinkTask, "BlinkTask", 200,
-                (void *) NULL, 1, NULL);
-                */
-
-    /*
-    if (cdcdf_acm_is_enabled()) {
-        ret = cdcdf_acm_write(buf, 7);
-    }
-    */
 
     //spi_m_dma_register_callback(&SPI_SERCOM0, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_SERCOM0);
 
-    vTaskStartScheduler();
 }
 
 void vAssertCalled( void )

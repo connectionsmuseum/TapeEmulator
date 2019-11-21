@@ -326,7 +326,7 @@
 // <0x3=>PAD[3]
 // <id> spi_master_rxpo
 #ifndef CONF_SERCOM_1_SPI_RXPO
-#define CONF_SERCOM_1_SPI_RXPO 2
+#define CONF_SERCOM_1_SPI_RXPO 3
 #endif
 
 // <o> Transmit Data Pinout

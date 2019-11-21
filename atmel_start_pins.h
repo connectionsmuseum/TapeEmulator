@@ -52,17 +52,19 @@
 
 #define NEOPIX GPIO(GPIO_PORTC, 24)
 
-#define PIN_FORWARD GPIO(GPIO_PORTC, 11) // D44
-#define PIN_FF      GPIO(GPIO_PORTC, 10) // D45
-#define PIN_REV     GPIO(GPIO_PORTC,  6) // D46
-#define PIN_FR      GPIO(GPIO_PORTC,  4) // D48
+// Deprecated
+// #define PIN_FORWARD GPIO(GPIO_PORTC, 11) // D44
+// #define PIN_FF      GPIO(GPIO_PORTC, 10) // D45
+// #define PIN_REV     GPIO(GPIO_PORTC,  6) // D46
+// #define PIN_FR      GPIO(GPIO_PORTC,  4) // D48
 
 
 // SERCOM ports for data out
-#define D37 GPIO(GPIO_PORTA, 16) // PCC_D0, SERCOM1.0+3.1
-#define D36 GPIO(GPIO_PORTA, 17) // PCC_D1, SERCOM1.1+3.0
-#define D35 GPIO(GPIO_PORTA, 18) // PCC_D2, SERCOM1.2+3.2
-#define D34 GPIO(GPIO_PORTA, 19) // PCC_D3, SERCOM1.3+3.3
+// Deprecated
+// #define D37 GPIO(GPIO_PORTA, 16) // PCC_D0, SERCOM1.0+3.1
+// #define D36 GPIO(GPIO_PORTA, 17) // PCC_D1, SERCOM1.1+3.0
+// #define D35 GPIO(GPIO_PORTA, 18) // PCC_D2, SERCOM1.2+3.2
+// #define D34 GPIO(GPIO_PORTA, 19) // PCC_D3, SERCOM1.3+3.3
 
 // SD Card SERCOM
 #define PB26 GPIO(GPIO_PORTB, 26) // 102, SD_MOSI
@@ -70,6 +72,50 @@
 #define PB29 GPIO(GPIO_PORTB, 29) // 105, SD_MISO
 #define SD_CD GPIO(GPIO_PORTB, 31)
 #define SD_CS GPIO(GPIO_PORTB, 28)
+
+//
+// Connector to the converter board. Using pin names from 3A CC documentation.
+//
+// Following are FROM_CTTC
+#define MANEN0 GPIO(GPIO_PORTD, 12)
+#define WRENAB0 GPIO(GPIO_PORTA, 15)
+#define WTA10 GPIO(GPIO_PORTC, 17)
+#define WTA00 GPIO(GPIO_PORTC, 16)
+#define RTA10 GPIO(GPIO_PORTA, 12)
+#define RTA00 GPIO(GPIO_PORTA, 14)
+
+// This powers the input buffer chips.
+#define BOARD_3V3 GPIO(GPIO_PORTA, 23)
+
+// Following are TO_CTTC
+#define TTBOTA0 GPIO(GPIO_PORTA, 22)
+#define TTEOTA0 GPIO(GPIO_PORTA, 21)
+#define TTRDY0 GPIO(GPIO_PORTA, 20)
+
+// FROM_CTTC
+#define WRDATA GPIO(GPIO_PORTA, 19)  // SERCOM1.3+3.3
+#define D35 GPIO(GPIO_PORTA, 18)     // SERCOM1.2+3.2
+
+// Following are TO_CTTC
+#define RDCLK0 GPIO(GPIO_PORTA, 17)  // SERCOM1.1+3.0
+#define RDDATA0 GPIO(GPIO_PORTA, 16) // SERCOM1.0+3.1
+#define DATDET0 GPIO(GPIO_PORTC, 13)
+#define TIMA0 GPIO(GPIO_PORTC, 12)
+#define RWDINGA0 GPIO(GPIO_PORTC, 15)
+#define LPEW0 GPIO(GPIO_PORTC, 14)
+#define CARTWE0 GPIO(GPIO_PORTC, 11)
+#define TORO0 GPIO(GPIO_PORTC, 10)
+
+// Following are FROM_CTTC
+#define TTMSPT0 GPIO(GPIO_PORTC, 6)
+#define TTREWC0 GPIO(GPIO_PORTC, 7)
+#define TTINIT0 GPIO(GPIO_PORTC, 4)
+#define TTSEL0 GPIO(GPIO_PORTC, 5)
+#define TTSR0 GPIO(GPIO_PORTD, 11)
+#define TTFR0 GPIO(GPIO_PORTD, 8)
+#define TTSF0 GPIO(GPIO_PORTD, 9)
+#define TTFF0 GPIO(GPIO_PORTD, 10)
+
 
 
 #endif // ATMEL_START_PINS_H_INCLUDED
