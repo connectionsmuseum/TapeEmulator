@@ -69,6 +69,12 @@ void update_state() {
     int fast_speed = FAST_SPEED;
     int previous_tape_state = tape_state;
 
+    // TODO:
+    //   RWDINGA0 -- CTT is performing a tape rewind sequence
+    //   LPEW0 -- Status pulse from CTT to indiciate the CTT
+    //            has sensed the load point or early warning holes.
+    //            (Implemented but totally a guess)
+
     // Motion control
     if (get_pin_active_low(TTSF0)) {
         tape_state = STATE_FORWARD;
@@ -94,6 +100,13 @@ void update_state() {
         tape_state = STATE_IDLE;
     }
 
+    // "Tape is Moving" status lead
+    if(tape_state != STATE_IDLE) {
+        set_pin_active_low(TIMA0, true);
+    } else {
+        set_pin_active_low(TIMA0, false);
+    }
+
     // Beginning of Tape
     if(tape_position <= 0) {
         tape_position = 0;
@@ -109,13 +122,20 @@ void update_state() {
         set_pin_active_low(TTEOTA0, true);
     } else {
         set_pin_active_low(TTEOTA0, false);
+    }
 
+    // Early warning holes
+    // This is a total guess
+    if((tape_position < 300) && (tape_position > 50)) {
+        set_pin_active_low(LPEW0, true);
+    } else {
+        set_pin_active_low(LPEW0, false);
     }
 
     // Data Detect
     int current_block = find_block(tape_position);
     int intrablock_position = tape_position - current_block*(IBG_BYTES + BLOCK_BYTES);
-    if(tape_position > IBG_BYTES) {
+    if(intrablock_position > IBG_BYTES) {
         set_pin_active_low(DATDET0, true);
     } else {
         set_pin_active_low(DATDET0, true);
@@ -242,13 +262,21 @@ int main(void)
         result = f_open(&fp, "track0.dat", FA_READ);
     }
 
+    // Transport Ready
+    set_pin_active_low(TTRDY0, true);
+    // Cartridge is write enabled (from CTT to CTTC)
+    set_pin_active_low(CARTWE0, false);
+    // Tape OFF reel status (from CTT)
+    set_pin_active_low(TOR0, false);
+
     while(1) {
         delay_ms(1000);
         flash_pin(D13, &d13_state);
         // Print some status to USB.
         if (cdcdf_acm_is_enabled()) {
-            snprintf(usb_printbuf, 99, "State: %i, RD Track %i, DMA: %i, Position: %i.\n\r",
-                     tape_state, read_track, (int) dma_running, tape_position);
+            int block = find_block(tape_position);
+            snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i, Block: %i.\n\r",
+                     tape_state, read_track, (int) dma_running, tape_position, block);
             cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
 
             if(!f_eof(&fp)) {

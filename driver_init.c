@@ -78,12 +78,11 @@ void SPI_1_PORT_init(void)
     gpio_set_pin_direction(D35, GPIO_DIRECTION_IN);
     gpio_set_pin_function(D35, PINMUX_PA18C_SERCOM1_PAD2);
     gpio_set_pin_pull_mode(D35, GPIO_PULL_OFF);
-    
+
     gpio_set_pin_direction(WRDATA, GPIO_DIRECTION_OUT);
     gpio_set_pin_function(WRDATA, PINMUX_PA19C_SERCOM1_PAD3);
     gpio_set_pin_pull_mode(WRDATA, GPIO_PULL_OFF);
 
-    
 }
 
 void SPI_0_PORT_init(void)
@@ -471,7 +470,7 @@ void system_init(void)
 	gpio_set_pin_direction(RWDINGA0, GPIO_DIRECTION_OUT);
 	gpio_set_pin_direction(LPEW0, GPIO_DIRECTION_OUT);
 	gpio_set_pin_direction(CARTWE0, GPIO_DIRECTION_OUT);
-	gpio_set_pin_direction(TORO0, GPIO_DIRECTION_OUT);
+	gpio_set_pin_direction(TOR0, GPIO_DIRECTION_OUT);
 
 	gpio_set_pin_direction(A2, GPIO_DIRECTION_OUT);
 	gpio_set_pin_function(A2, GPIO_PIN_FUNCTION_OFF);

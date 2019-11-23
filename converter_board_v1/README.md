@@ -31,7 +31,7 @@ JP1 Pin | JP1 Pin | Direction | Function | Adafruit Pin | SAMD Pin |
    23   |   D42   |   TO_CTTC | RWDINGA0 |   PCC_D13    | PC15     |
    24   |   D43   |   TO_CTTC | LPEW0    |   PCC_D12    | PC14     |
    25   |   D44   |   TO_CTTC | CARTWE0  |   D44        | PC11     |
-   26   |   D45   |   TO_CTTC | TORO0    |   D45        | PC10     |
+   26   |   D45   |   TO_CTTC | TOR0     |   D45        | PC10     |
    27   |   D46   | FROM_CTTC | TTMSPT0  |   D46        | PC06     |
    28   |   D47   | FROM_CTTC | TTREWC0  |   D47        | PC07     |
    29   |   D48   | FROM_CTTC | TTINIT0  |   D48        | PC04     |
