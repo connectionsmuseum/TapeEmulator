@@ -1,4 +1,5 @@
 #include <atmel_start.h>
+#include <math.h>
 #include "usb_start.h"
 
 #include "FreeRTOS.h"
@@ -18,7 +19,36 @@ int tape_state = STATE_IDLE;
 int tape_position = 0;
 int read_track = 0;
 int write_track = 0;
-int MAX_TRACK_POSITION = 100000; // TODO: set this properly
+
+
+// Ticks are every 2.5ms
+// 1600 bit per inch tape, 300ft long.
+// ~358 blocks on tracks A and B
+// 1668 bytes per block incl preamble
+// Read at 30 inches per second. FF/FR is 90 inches per second
+// 1.55 inch interblock gap (IBG)
+// A block is 8.34 inches, 0.28 seconds.
+//
+// So:
+// Use bytes as position variable.
+// Maximum byte position is 720 000.
+// 30 inch per second = 6000 bytes per second (slow)
+//                    = 6000/400 = 15 bytes per tick
+// 90 inch per second = 45 bytes per tick
+//
+// IBG is 1.55 * 1600/8 = 310 bytes
+#define FAST_SPEED 45
+#define SLOW_SPEED 15
+#define IBG_BYTES 310
+#define BLOCK_BYTES 1668
+#define MAX_TRACK_POSITION 740000 // Added some extra padding
+
+// Define the "current block" as including the IBG that preceeds the data.
+// Calculate the current block with:
+// floor( tape_position / (IBG_BYTES + BLOCK_BYTES))
+// Start sending data when (tape_position - block_start) > IBG_BYTES, where
+// block_start = current_block * (IBG_BYTES + BLOCK_BYTES)
+
 
 bool dma_running = false;
 
@@ -35,10 +65,11 @@ static inline void set_pin_active_low(const uint8_t pin, const bool level) {
 }
 
 void update_state() {
-    int normal_speed = 10;
-    int fast_speed = 50;
+    int normal_speed = SLOW_SPEED;
+    int fast_speed = FAST_SPEED;
     int previous_tape_state = tape_state;
 
+    // Motion control
     if (get_pin_active_low(TTSF0)) {
         tape_state = STATE_FORWARD;
         if(previous_tape_state == STATE_FORWARD) {
@@ -63,6 +94,7 @@ void update_state() {
         tape_state = STATE_IDLE;
     }
 
+    // Beginning of Tape
     if(tape_position <= 0) {
         tape_position = 0;
         set_pin_active_low(TTBOTA0, true);
@@ -71,6 +103,7 @@ void update_state() {
 
     }
 
+    // End of Tape
     if(tape_position >= MAX_TRACK_POSITION) {
         tape_position = MAX_TRACK_POSITION;
         set_pin_active_low(TTEOTA0, true);
@@ -79,6 +112,16 @@ void update_state() {
 
     }
 
+    // Data Detect
+    int current_block = find_block(tape_position);
+    int intrablock_position = tape_position - current_block*(IBG_BYTES + BLOCK_BYTES);
+    if(tape_position > IBG_BYTES) {
+        set_pin_active_low(DATDET0, true);
+    } else {
+        set_pin_active_low(DATDET0, true);
+    }
+
+    // Get the track settings, only if we're not sending data.
     if(!dma_running) {
         read_track = (get_pin_active_low(RTA10)*2 +
                       get_pin_active_low(RTA00)*1);
@@ -128,11 +171,8 @@ void tick(const struct timer_task *const timer_task) {
     }
 }
 
-/*
- * TODO:
- */
 int find_block(int tape_position) {
-    return 0;
+    return floor( tape_position / (IBG_BYTES + BLOCK_BYTES));
 }
 
 /*
