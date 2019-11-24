@@ -218,7 +218,7 @@
 // <i> The SPI data transfer rate
 // <id> spi_master_baud_rate
 #ifndef CONF_SERCOM_1_SPI_BAUD
-#define CONF_SERCOM_1_SPI_BAUD 4000
+#define CONF_SERCOM_1_SPI_BAUD 2000
 #endif
 
 // </h>
@@ -242,7 +242,7 @@
 // <i> I least significant or most significant bit is shifted out first (DORD)
 // <id> spi_master_arch_dord
 #ifndef CONF_SERCOM_1_SPI_DORD
-#define CONF_SERCOM_1_SPI_DORD 0x0
+#define CONF_SERCOM_1_SPI_DORD 0x1
 #endif
 
 // <o> Clock Polarity

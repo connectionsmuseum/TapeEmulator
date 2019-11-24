@@ -19,7 +19,12 @@ int tape_state = STATE_IDLE;
 int tape_position = 0;
 int read_track = 0;
 int write_track = 0;
+bool dma_running = false;
+bool in_transfer_block = false;
 
+// This is for printing error messages when the
+// file can't be found.
+int last_alerted_block = -1;
 
 // Ticks are every 2.5ms
 // 1600 bit per inch tape, 300ft long.
@@ -34,6 +39,7 @@ int write_track = 0;
 // Maximum byte position is 720 000.
 // 30 inch per second = 6000 bytes per second (slow)
 //                    = 6000/400 = 15 bytes per tick
+//                    = 48 000 bits per second
 // 90 inch per second = 45 bytes per tick
 //
 // IBG is 1.55 * 1600/8 = 310 bytes
@@ -50,11 +56,9 @@ int write_track = 0;
 // block_start = current_block * (IBG_BYTES + BLOCK_BYTES)
 
 
-bool dma_running = false;
-
 static struct timer_task TIMER_1_task1;
 
-static uint8_t example_SPI_1[12] = "Hello World!";
+static uint8_t block_buffer[2000];
 
 static inline bool get_pin_active_low(const uint8_t pin) {
     return !gpio_get_pin_level(pin);
@@ -125,7 +129,8 @@ void update_state() {
     }
 
     // Early warning holes
-    // This is a total guess
+    // This is a total guess. We might need to add some extra space
+    // on the tape before the first block.
     if((tape_position < 300) && (tape_position > 50)) {
         set_pin_active_low(LPEW0, true);
     } else {
@@ -135,7 +140,7 @@ void update_state() {
     // Data Detect
     int current_block = find_block(tape_position);
     int intrablock_position = tape_position - current_block*(IBG_BYTES + BLOCK_BYTES);
-    if(intrablock_position > IBG_BYTES) {
+    if((intrablock_position > IBG_BYTES) || dma_running) {
         set_pin_active_low(DATDET0, true);
     } else {
         set_pin_active_low(DATDET0, true);
@@ -149,6 +154,13 @@ void update_state() {
         write_track = (get_pin_active_low(WTA10)*2 +
                        get_pin_active_low(WTA00)*1);
     }
+
+    /*
+     * DEBUG DEBUG DEBUG
+     *
+     *
+     */
+    read_track = 1;
 
 }
 
@@ -164,8 +176,11 @@ void flash_pin(const uint8_t pin, bool *state_variable) {
 
 void tick(const struct timer_task *const timer_task) {
 
-    int block_id;
+    int current_block;
+    int intrablock_position;
 
+    // Most of update_state() can probably get merged in here,
+    // they didn't end up being very different from each other.
     update_state();
 
     // Only to debug ticking.
@@ -174,16 +189,16 @@ void tick(const struct timer_task *const timer_task) {
     if(tape_state == STATE_FORWARD) {
         // Check if DMA is active, else start
         if(!dma_running) {
-            block_id = find_block(tape_position);
-            // block_id = -1 for IBG. We don't need to
-            // know which IBG we're in.
-            if(block_id >= 0) {
-                transfer_block(block_id);
+            current_block = find_block(tape_position);
+            intrablock_position = tape_position - current_block*(IBG_BYTES + BLOCK_BYTES);
+            if(intrablock_position > IBG_BYTES) {
+                // Set this early so we don't re-enter on the next tick,
+                // possibly before the transfer is started
+                dma_running = true;
+                transfer_block(current_block);
             }
         }
-
     } else {
-
         // Disable transfers if we're not in normal-forward.
         spi_m_dma_disable(&SPI_1);
         dma_running = false;
@@ -196,15 +211,101 @@ int find_block(int tape_position) {
 }
 
 /*
- * TODO:
+ * Read a block from the SD card and send it via DMA.
+ *
+ * We set DORD=1 in config/hpl_sercom_config.h to send LSB first.
+ *
+ * There's a setting in the datasheet called DATA32B that should send
+ * (byte 3)(byte 2)(byte 1)(byte 0) in that order, but the ASF4 headers
+ * don't support it and I don't want to muck with it right now, so
+ * will code a crude byte swap instead.
+ *
  */
 void transfer_block(int block_id) {
     struct io_descriptor *io;
-    spi_m_dma_get_io_descriptor(&SPI_1, &io);
+    FRESULT result;
+    FIL fp;
+    char filename[50];
+    char errormsg[200];
+    unsigned int bytes_read;
+    char tmp_a, tmp_b;
 
+    if(in_transfer_block) {
+        return;
+    }
+    in_transfer_block = true;
+
+    snprintf(filename, 49, "%i/%04i.bin", read_track, block_id);
+
+    // Hacky
+    if (last_alerted_block == block_id) {
+        in_transfer_block = false;
+        return;
+    }
+
+    result = f_open(&fp, filename, FA_READ);
+    if(result != FR_OK) {
+        if ((last_alerted_block != block_id) &&
+            cdcdf_acm_is_enabled()) {
+            snprintf(errormsg, 199, "Could not open file at '%s'\n\r",
+                     filename);
+            cdcdf_acm_write((uint8_t *) errormsg, strlen(errormsg));
+        }
+        last_alerted_block = block_id;
+        dma_running = false;
+        in_transfer_block = false;
+        return;
+    } else {
+        last_alerted_block = -1;
+    }
+
+    /*
+     *
+     * DEBUG
+     */
+    // in_transfer_block = false;
+    // return;
+
+    result = f_read(&fp, block_buffer, 2000, &bytes_read);
+    if(result != FR_OK) {
+        if ((last_alerted_block != block_id) &&
+            cdcdf_acm_is_enabled()) {
+            snprintf(errormsg, 199, "Could not read file at '%s'\n\r",
+                     filename);
+            cdcdf_acm_write((uint8_t *) errormsg, strlen(errormsg));
+        }
+        last_alerted_block = block_id;
+        dma_running = false;
+        in_transfer_block = false;
+        return;
+    } else {
+        last_alerted_block = -1;
+    }
+
+    f_close(&fp);
+
+    if(cdcdf_acm_is_enabled()) {
+        snprintf(errormsg, 199, "Read %i bytes of '%s'\n\r",
+                 bytes_read, filename);
+        cdcdf_acm_write((uint8_t *) errormsg, strlen(errormsg));
+    }
+
+    /*
+    for(int i = 0; i < (bytes_read / 4); i += 4) {
+        tmp_a = block_buffer[i + 2];
+        tmp_b = block_buffer[i + 3];
+        block_buffer[i + 2] = block_buffer[i + 1];
+        block_buffer[i + 3] = block_buffer[i];
+        block_buffer[i] = tmp_b;
+        block_buffer[i + 1] = tmp_a;
+    }
+    */
+
+    spi_m_dma_get_io_descriptor(&SPI_1, &io);
     spi_m_dma_enable(&SPI_1);
-    io_write(io, example_SPI_1, 12);
+    io_write(io, block_buffer, bytes_read);
     dma_running = true;
+    in_transfer_block = false;
     return;
 }
 
@@ -215,32 +316,14 @@ static void tx_complete_cb_SPI_1(struct _dma_resource *resource)
     dma_running = false;
 }
 
-void SPI_1_example(void)
-{
-    struct io_descriptor *io;
-    spi_m_dma_get_io_descriptor(&SPI_1, &io);
-
-    spi_m_dma_register_callback(&SPI_1, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_1);
-    spi_m_dma_enable(&SPI_1);
-    io_write(io, example_SPI_1, 12);
-    dma_running = true;
-}
-
-
 int main(void)
 {
-    char usb_printbuf[100];
+    char usb_printbuf[200];
     FATFS FatFs;
     FIL fp;
     unsigned int nbytes_read;
-    int ret;
-    uint32_t baud_register;
     struct io_descriptor *io;
-    uint8_t good;
-    uint8_t buf[10];
-    int count = 0;
     FRESULT result;
-    uint8_t response[4];
 
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
@@ -258,9 +341,6 @@ int main(void)
     composite_device_start();
 
     result = f_mount(&FatFs, "", 0);
-    if(result == FR_OK) {
-        result = f_open(&fp, "track0.dat", FA_READ);
-    }
 
     // Transport Ready
     set_pin_active_low(TTRDY0, true);
@@ -275,7 +355,7 @@ int main(void)
         // Print some status to USB.
         if (cdcdf_acm_is_enabled()) {
             int block = find_block(tape_position);
-            snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i, Block: %i.\n\r",
+            snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i, Block: %i. \n\r",
                      tape_state, read_track, (int) dma_running, tape_position, block);
             cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
 
@@ -288,7 +368,7 @@ int main(void)
     }
 
 
-    //spi_m_dma_register_callback(&SPI_SERCOM0, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_SERCOM0);
+    spi_m_dma_register_callback(&SPI_1, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_SPI_1);
 
 }
 

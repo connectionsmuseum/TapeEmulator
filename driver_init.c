@@ -475,6 +475,11 @@ void system_init(void)
 	gpio_set_pin_direction(A2, GPIO_DIRECTION_OUT);
 	gpio_set_pin_function(A2, GPIO_PIN_FUNCTION_OFF);
 
+	gpio_set_pin_pull_mode(TTFR0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTSR0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTFF0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTSF0, GPIO_PULL_UP);
+
 	EXTERNAL_IRQ_0_init();
 
 	EVENT_SYSTEM_0_init();
