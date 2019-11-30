@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "driver_init.h"
-#include "rtos_start.h"
 #include "usb_start.h"
 #include "sd_mmc_start.h"
 

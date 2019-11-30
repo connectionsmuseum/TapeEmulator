@@ -3,11 +3,6 @@
 #include <stdio.h>
 #include "usb_start.h"
 
-#include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
-#include "task.h"
-#include "timers.h"
-
 #include "pixel.h"
 #include "tape_states.h"
 #include "fatFS/ff.h"
@@ -287,8 +282,6 @@ int main(void)
             }
         }
     }
-
-
 
 }
 

@@ -1,10 +1,6 @@
 
 #include <atmel_start.h>
-#include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
 
-#include "timers.h"
-#include "task.h"
 #include "hal/include/hpl_delay.h"
 
 #include "tape_states.h"
