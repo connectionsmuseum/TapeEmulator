@@ -127,7 +127,8 @@ hpl/cmcc/hpl_cmcc.o \
 thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o \
 pixel.o \
 fatFS/diskio.o \
-fatFS/ff.o
+fatFS/ff.o \
+block_transfer.o
 
 OBJS_AS_ARGS +=  \
 "hal/src/hal_io.o" \
@@ -193,7 +194,8 @@ OBJS_AS_ARGS +=  \
 "thirdparty/RTOS/freertos/FreeRTOSV10.0.0/Source/tasks.o" \
 "pixel.o" \
 "fatFS/diskio.o" \
-"fatFS/ff.o"
+"fatFS/ff.o" \
+"block_transfer.o"
 
 # List the directories containing header files
 DIR_INCLUDES +=  \
@@ -314,7 +316,8 @@ DEPS_AS_ARGS +=  \
 "hpl/sercom/hpl_sercom.d" \
 "pixel.d" \
 "fatFS/diskio.d" \
-"fatFS/ff.d"
+"fatFS/ff.d" \
+"block_transfer.d"
 
 OUTPUT_FILE_NAME :=TapeEmulator
 QUOTE := "
