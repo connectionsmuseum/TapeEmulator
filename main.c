@@ -18,15 +18,13 @@ int read_track = 0;
 int write_track = 0;
 bool in_transfer_block = false;
 
+FATFS FatFs;
+
 // Incremented by the tick interrupt handler,
 // received in the main loop to trigger updates and
 // reset to zero.
 volatile int tick_flag = 0;
 volatile int debug_tick_flag = 0;
-
-// This is for printing error messages when the
-// file can't be found.
-int last_alerted_block = -1;
 
 // Ticks are every 2.5ms
 // 1600 bit per inch tape, 300ft long.
@@ -190,7 +188,7 @@ void update_state() {
      * need to find a way to do this carefully. Returns quickly
      * if next block is already loaded into buffer.
      */
-    load_next_block(read_track, current_block + 1);
+    load_next_block(read_track, current_block);
 
 }
 
@@ -227,7 +225,6 @@ int find_block(int tape_position) {
 int main(void)
 {
     char usb_printbuf[200];
-    FATFS FatFs;
     FRESULT result;
 
     /* Initializes MCU, drivers and middleware */

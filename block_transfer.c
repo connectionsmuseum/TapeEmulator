@@ -23,7 +23,7 @@ static struct transfer_buffer bufferA;
 static struct transfer_buffer bufferB;
 
 void _initialize_buffer(struct transfer_buffer *buf);
-int _load_block_into_buffer(int track, int block_id, uint8_t *buffer);
+int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buffer);
 static void tx_complete_cb_bufferA(struct _dma_resource *resource);
 static void tx_complete_cb_bufferB(struct _dma_resource *resource);
 
@@ -47,24 +47,47 @@ void _initialize_buffer(struct transfer_buffer *buf) {
  * load from SD card if not already loaded.
  *
  */
-void load_next_block(int track, int block_id) {
+void load_next_block(int track, int current_block_id) {
 
-    if((block_id == bufferA.block_id) ||
-       (block_id == bufferA.block_id)) {
+    int next_block_id = current_block_id + 1;
+
+    if((current_block_id != bufferA.block_id) &&
+       (current_block_id != bufferB.block_id)) {
+
+        // Need to load the current block; preempts loading
+        // the next block
+        if((bufferA.length == 0) && !bufferA.locked) {
+            _load_block_into_buffer(track, current_block_id, &bufferA);
+        } else if(!bufferB.locked) {
+            // Write into this buffer even if it's occupied, but
+            // not if it's locked.
+            _load_block_into_buffer(track, current_block_id, &bufferB);
+        }
+
+        // We don't want to load two blocks in the same function call.
         return;
     }
 
-    if((bufferA.length == 0) && !bufferA.locked) {
-        bufferA.length = _load_block_into_buffer(track, block_id, bufferA.block);
-        bufferA.track = track;
-        bufferA.block_id = block_id;
-    } else if(!bufferB.locked) {
-        // Write into this buffer even if it's occupied, but
-        // not if it's locked.
-        bufferB.length = _load_block_into_buffer(track, block_id, bufferB.block);
-        bufferB.track = track;
-        bufferB.block_id = block_id;
+    // Check if we need to load the next block
+    if((next_block_id == bufferA.block_id) ||
+       (next_block_id == bufferB.block_id)) {
+        return;
     }
+
+    // Write the new block into whichever buffer
+    // *doesn't* have the current block.
+    if(current_block_id == bufferA.block_id) {
+        // Write into B
+        if(!bufferB.locked) {
+            _load_block_into_buffer(track, next_block_id, &bufferB);
+        }
+    } else if (current_block_id == bufferB.block_id) {
+        // Write into A
+        if(!bufferA.locked) {
+            _load_block_into_buffer(track, next_block_id, &bufferA);
+        }
+    }
+
 }
 
 /*
@@ -72,12 +95,13 @@ void load_next_block(int track, int block_id) {
  * buffer. Returns the length stored in the buffer, up to BLOCK_SIZE.
  *
  */
-int _load_block_into_buffer(int track, int block_id, uint8_t *buffer) {
+int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buffer) {
 
     FIL fp;
     FRESULT result;
     char filename[50];
-    unsigned int bytes_read;
+
+    _initialize_buffer(buffer);
 
     snprintf(filename, 49, "%i/%04i.bin", track, block_id);
     result = f_open(&fp, filename, FA_READ);
@@ -86,7 +110,7 @@ int _load_block_into_buffer(int track, int block_id, uint8_t *buffer) {
         return 0;
     }
 
-    result = f_read(&fp, buffer, BLOCK_SIZE, &bytes_read);
+    result = f_read(&fp, buffer->block, BLOCK_SIZE, &buffer->length);
     if(result != FR_OK) {
         // Error handle
         f_close(&fp);
@@ -106,9 +130,11 @@ int _load_block_into_buffer(int track, int block_id, uint8_t *buffer) {
     }
     */
 
+    buffer->track = track;
+    buffer->block_id = block_id;
 
     f_close(&fp);
-    return bytes_read;
+    return buffer->length;
 }
 
 
