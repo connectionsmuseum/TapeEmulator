@@ -194,12 +194,19 @@ DRESULT disk_read (
                 io_read(io, buff, 512);
                 io_read(io, crc, 2);
             } else {
-                // Have not tested multi-sector reads yet
+                // Multi-sector read.
                 result = send_SD_CMD(io, 18, sector, 0x0, NULL);
 
                 while(received_blocks < count) {
-                    io_read(io, &token, 1);
-                    io_read(io, buff, 512);
+                    loop_count = 0;
+                    do {
+                        io_read(io, &token, 1);
+                        loop_count += 1;
+                    } while((token == 0xff) && (count < 20));
+                    if(token != 0xfe) {
+                        return RES_ERROR;
+                    }
+                    io_read(io, buff + received_blocks*512, 512);
                     io_read(io, crc, 2);
                     received_blocks += 1;
                 }

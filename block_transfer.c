@@ -92,8 +92,7 @@ void load_next_block(int track, int current_block_id) {
 
 /*
  * Does the work of loading a single block into the supplied
- * buffer. Returns the length stored in the buffer, up to BLOCK_SIZE.
- *
+ * buffer.
  */
 int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buffer) {
 
@@ -102,6 +101,13 @@ int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buf
     char filename[50];
 
     _initialize_buffer(buffer);
+
+    // By setting these early, we ensuring the buffering code sees this block
+    // even if the reads fail and we don't have any data for it.
+    // For example, track 1 block 0000 doesn't exist; we don't want to send data, but we
+    // also don't want to loop forever trying to read it from the SD card.
+    buffer->track = track;
+    buffer->block_id = block_id;
 
     snprintf(filename, 49, "%i/%04i.bin", track, block_id);
     result = f_open(&fp, filename, FA_READ);
@@ -129,9 +135,6 @@ int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buf
         block_buffer[i + 1] = tmp_a;
     }
     */
-
-    buffer->track = track;
-    buffer->block_id = block_id;
 
     f_close(&fp);
     return buffer->length;
