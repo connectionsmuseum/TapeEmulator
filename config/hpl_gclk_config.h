@@ -328,7 +328,7 @@
 // <i> This defines the clock source for generic clock generator 4
 // <id> gclk_gen_4_oscillator
 #ifndef CONF_GCLK_GEN_4_SOURCE
-#define CONF_GCLK_GEN_4_SOURCE GCLK_GENCTRL_SRC_DPLL0
+#define CONF_GCLK_GEN_4_SOURCE GCLK_GENCTRL_SRC_DFLL
 #endif
 
 // <q> Run in Standby
@@ -378,7 +378,7 @@
 //<o> Generic clock generator 4 division <0x0000-0xFFFF>
 // <id> gclk_gen_4_div
 #ifndef CONF_GCLK_GEN_4_DIV
-#define CONF_GCLK_GEN_4_DIV 1
+#define CONF_GCLK_GEN_4_DIV 4
 #endif
 // </h>
 // </e>

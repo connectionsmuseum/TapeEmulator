@@ -99,6 +99,7 @@ int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buf
     FIL fp;
     FRESULT result;
     char filename[50];
+    uint8_t tmp_a;
 
     _initialize_buffer(buffer);
 
@@ -124,17 +125,15 @@ int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buf
     }
 
     /*
-     *  Byte-swap if necessary
+     *  Byte-swap and invert bits to get output polarity right.
+     *  SD-1C904 says "LOW=LOGICAL ONE"
      *
-    for(int i = 0; i < (bytes_read / 4); i += 4) {
-        tmp_a = block_buffer[i + 2];
-        tmp_b = block_buffer[i + 3];
-        block_buffer[i + 2] = block_buffer[i + 1];
-        block_buffer[i + 3] = block_buffer[i];
-        block_buffer[i] = tmp_b;
-        block_buffer[i + 1] = tmp_a;
+     */
+    for(int i = 0; i < (buffer->length - 1) ; i += 2) {
+        tmp_a = buffer->block[i + 1];
+        buffer->block[i + 1] = ~buffer->block[i];
+        buffer->block[i] = ~tmp_a;
     }
-    */
 
     f_close(&fp);
     return buffer->length;

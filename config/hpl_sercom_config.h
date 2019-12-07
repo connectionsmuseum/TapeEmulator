@@ -218,7 +218,7 @@
 // <i> The SPI data transfer rate
 // <id> spi_master_baud_rate
 #ifndef CONF_SERCOM_1_SPI_BAUD
-#define CONF_SERCOM_1_SPI_BAUD 2000
+#define CONF_SERCOM_1_SPI_BAUD 48000
 #endif
 
 // </h>
@@ -251,7 +251,7 @@
 // <i> Determines if the leading edge is rising or falling with a corresponding opposite edge at the trailing edge. (CPOL)
 // <id> spi_master_arch_cpol
 #ifndef CONF_SERCOM_1_SPI_CPOL
-#define CONF_SERCOM_1_SPI_CPOL 0x0
+#define CONF_SERCOM_1_SPI_CPOL 0x1
 #endif
 
 // <o> Clock Phase
