@@ -142,6 +142,12 @@ DSTATUS disk_initialize (
             result = send_SD_CMD(io, 16, 512, 0x0, NULL);
             Stat = 0;
 
+            //
+            // Set baud rate to something faster.
+            //
+            spi_m_sync_disable(&SPI_2);
+            spi_m_sync_set_baudrate(&SPI_2, 1);
+            spi_m_sync_enable(&SPI_2);
 
             return 0;
 
