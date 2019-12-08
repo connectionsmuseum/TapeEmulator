@@ -475,10 +475,20 @@ void system_init(void)
 	gpio_set_pin_direction(A2, GPIO_DIRECTION_OUT);
 	gpio_set_pin_function(A2, GPIO_PIN_FUNCTION_OFF);
 
+	gpio_set_pin_pull_mode(MANEN0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(WRENAB0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(WTA10, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(WTA00, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(RTA10, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(RTA00, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTMSPT0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTREWC0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTSEL0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTFR0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTSR0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTFF0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTSF0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(WRDATA, GPIO_PULL_UP);
 
 	EXTERNAL_IRQ_0_init();
 

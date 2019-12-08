@@ -95,7 +95,7 @@ void load_next_block(int track, int current_block_id) {
  * Does the work of loading a single block into the supplied
  * buffer.
  *
- * This takes about 140 ms to load a block.
+ * This takes about 20 ms to load a block.
  */
 int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buffer) {
 

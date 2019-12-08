@@ -124,6 +124,7 @@ void update_state() {
         set_pin_active_low(TTBOTA0, false);
 
     }
+    // DEBUG set_pin_active_low(TTBOTA0, false);
 
     // End of Tape
     if(tape_position >= MAX_TRACK_POSITION) {
@@ -169,7 +170,7 @@ void update_state() {
      * Force track 1, ignores requests to read other tracks.
      *
      */
-    read_track = 1;
+    // read_track = 1;
 
     /*
      * Start transfers
@@ -192,8 +193,12 @@ void update_state() {
      * Load the next block; potentially expensive so might
      * need to find a way to do this carefully. Returns quickly
      * if next block is already loaded into buffer.
+     * Don't load data if we're moving fast or in reverse.
      */
-    load_next_block(read_track, current_block);
+    if((tape_state == STATE_FORWARD) ||
+       (tape_state == STATE_IDLE)) {
+        load_next_block(read_track, current_block);
+    }
 
     // Use this to time the update duration.
     gpio_set_pin_level(D12, false);
@@ -267,6 +272,8 @@ int main(void)
     set_pin_active_low(CARTWE0, false);
     // Tape OFF reel status (from CTT)
     set_pin_active_low(TOR0, false);
+    // Not rewinding
+    set_pin_active_low(RWDINGA0, false);
 
     while(1) {
 
@@ -281,9 +288,23 @@ int main(void)
             // Print some status to USB.
             if (cdcdf_acm_is_enabled()) {
                 int block = find_block(tape_position);
+
                 snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i, Block: %i. \n\r",
                          tape_state, read_track, (int) dma_running(), tape_position, block);
                 cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+                /*
+                snprintf(usb_printbuf, 99, "MANEN0 %i, WRENAB0 %i, WTA10 %i, WTA00 %i, RTA10 %i, RTA00 %i \n\r",
+                        get_pin_active_low(MANEN0), get_pin_active_low(WRENAB0), get_pin_active_low(WTA10), get_pin_active_low(WTA00),
+                        get_pin_active_low(RTA10), get_pin_active_low(RTA00));
+                cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+
+                snprintf(usb_printbuf, 99, "TTMSPT0 %i, TTREWC0 %i, TTSEL0 %i, TTFR0 %i, TTSR0 %i, TTFF0 %i, TTSF0 %i, WRDATA %i \n\r",
+                        get_pin_active_low(TTMSPT0), get_pin_active_low(TTREWC0), get_pin_active_low(TTSEL0), get_pin_active_low(TTFR0),
+                        get_pin_active_low(TTSR0), get_pin_active_low(TTFF0), get_pin_active_low(TTSF0), get_pin_active_low(WRDATA));
+                cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+                */
+
+
             }
         }
     }
