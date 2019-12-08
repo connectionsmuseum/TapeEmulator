@@ -1,5 +1,6 @@
 
 
+#include <atmel_start.h>
 #include <stdio.h>
 #include "block_transfer.h"
 #include "fatFS/ff.h"
@@ -93,6 +94,8 @@ void load_next_block(int track, int current_block_id) {
 /*
  * Does the work of loading a single block into the supplied
  * buffer.
+ *
+ * This takes about 140 ms to load a block.
  */
 int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buffer) {
 
@@ -100,6 +103,9 @@ int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buf
     FRESULT result;
     char filename[50];
     uint8_t tmp_a;
+
+    // For timing
+    gpio_set_pin_level(D10, true);
 
     _initialize_buffer(buffer);
 
@@ -136,6 +142,10 @@ int _load_block_into_buffer(int track, int block_id, struct transfer_buffer *buf
     }
 
     f_close(&fp);
+
+    // For timing
+    gpio_set_pin_level(D10, false);
+
     return buffer->length;
 }
 
@@ -151,6 +161,12 @@ void send_block(int block_id) {
         buffer_to_send = &bufferB;
         spi_m_dma_register_callback(_SPI, SPI_M_DMA_CB_TX_DONE, tx_complete_cb_bufferB);
     } else {
+        return;
+    }
+
+    // If the block is empty, we don't want to lock the buffer and
+    // set DMA running, or we won't be able to clear it.
+    if(buffer_to_send->length == 0) {
         return;
     }
 
@@ -174,10 +190,12 @@ bool dma_running() {
 }
 
 static void tx_complete_cb_bufferA(struct _dma_resource *resource) {
+    _dma_running = false;
     _initialize_buffer(&bufferA);
 }
 
 static void tx_complete_cb_bufferB(struct _dma_resource *resource) {
+    _dma_running = false;
     _initialize_buffer(&bufferB);
 }
 

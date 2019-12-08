@@ -75,6 +75,9 @@ void update_state() {
     int current_block;
     int intrablock_position;
 
+    // Use this to time the update duration.
+    gpio_set_pin_level(D12, true);
+
     // TODO:
     //   RWDINGA0 -- CTT is performing a tape rewind sequence
     //   LPEW0 -- Status pulse from CTT to indiciate the CTT
@@ -183,12 +186,17 @@ void update_state() {
         cancel_transfer();
     }
 
+
+
     /*
      * Load the next block; potentially expensive so might
      * need to find a way to do this carefully. Returns quickly
      * if next block is already loaded into buffer.
      */
     load_next_block(read_track, current_block);
+
+    // Use this to time the update duration.
+    gpio_set_pin_level(D12, false);
 
 }
 
@@ -205,7 +213,7 @@ void flash_pin(const uint8_t pin, bool *state_variable) {
 void tick(const struct timer_task *const timer_task) {
 
     // Only to debug ticking.
-    flash_pin(D12, &d12_state);
+    // flash_pin(D12, &d12_state);
 
     tick_flag += 1;
 
