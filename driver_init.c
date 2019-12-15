@@ -29,6 +29,8 @@ void EXTERNAL_IRQ_0_init(void)
 	hri_gclk_write_PCHCTRL_reg(GCLK, EIC_GCLK_ID, CONF_GCLK_EIC_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
 	hri_mclk_set_APBAMASK_EIC_bit(MCLK);
 
+        gpio_set_pin_function(TTINIT0, PINMUX_PC04A_EIC_EXTINT4);
+
 	ext_irq_init();
 }
 
@@ -53,7 +55,7 @@ static void TIMER_0_init(void)
 
 static void TIMER_1_init(void)
 {
-    
+
        // Setup TIMER 1 to pull from GCLK 1, 48MHz
        hri_mclk_set_APBAMASK_TC0_bit(MCLK);
        hri_gclk_write_PCHCTRL_reg(GCLK, TC0_GCLK_ID, CONF_GCLK_TC0_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
@@ -415,6 +417,9 @@ void system_init(void)
 
 	gpio_set_pin_function(D9, GPIO_PIN_FUNCTION_OFF);
 
+	gpio_set_pin_pull_mode(D11, GPIO_PULL_UP);
+	gpio_set_pin_direction(D11, GPIO_DIRECTION_OUT);
+
 	// GPIO on PB03
 
 	gpio_set_pin_level(A2,
@@ -453,6 +458,7 @@ void system_init(void)
 	gpio_set_pin_direction(RTA00, GPIO_DIRECTION_IN);
 	gpio_set_pin_direction(TTMSPT0, GPIO_DIRECTION_IN);
 	gpio_set_pin_direction(TTREWC0, GPIO_DIRECTION_IN);
+	gpio_set_pin_direction(TTINIT0, GPIO_DIRECTION_IN);
 	gpio_set_pin_direction(TTSEL0, GPIO_DIRECTION_IN);
 	gpio_set_pin_direction(TTSR0, GPIO_DIRECTION_IN);
 	gpio_set_pin_direction(TTFR0, GPIO_DIRECTION_IN);
@@ -483,6 +489,7 @@ void system_init(void)
 	gpio_set_pin_pull_mode(RTA00, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTMSPT0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTREWC0, GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(TTINIT0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTSEL0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTFR0, GPIO_PULL_UP);
 	gpio_set_pin_pull_mode(TTSR0, GPIO_PULL_UP);

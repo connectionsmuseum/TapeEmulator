@@ -2,6 +2,10 @@
 #ifndef HPL_EIC_CONFIG_H
 #define HPL_EIC_CONFIG_H
 
+#ifndef CONFIG_EIC_EXTINT_MAP
+#define CONFIG_EIC_EXTINT_MAP {4, PIN_PC04},
+#endif
+
 // <<< Use Configuration Wizard in Context Menu >>>
 
 // <h> Basic Settings
@@ -259,7 +263,7 @@
 // <e> Interrupt 4 Settings
 // <id> eic_arch_enable_irq_setting4
 #ifndef CONF_EIC_ENABLE_IRQ_SETTING4
-#define CONF_EIC_ENABLE_IRQ_SETTING4 0
+#define CONF_EIC_ENABLE_IRQ_SETTING4 1
 #endif
 
 // <q> External Interrupt 4 Filter Enable
@@ -293,14 +297,14 @@
 // <i> This defines input sense trigger
 // <id> eic_arch_sense4
 #ifndef CONF_EIC_SENSE4
-#define CONF_EIC_SENSE4 EIC_NMICTRL_NMISENSE_NONE_Val
+#define CONF_EIC_SENSE4 EIC_NMICTRL_NMISENSE_FALL_Val
 #endif
 
 // <q> External Interrupt 4 Asynchronous Edge Detection Mode
 // <i> Indicates the external interrupt 4 detection mode operated synchronously or asynchronousl
 // <id> eic_arch_asynch4
 #ifndef CONF_EIC_ASYNCH4
-#define CONF_EIC_ASYNCH4 0
+#define CONF_EIC_ASYNCH4 1
 #endif
 
 // </e>

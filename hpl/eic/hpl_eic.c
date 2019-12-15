@@ -70,7 +70,7 @@ static int ffs(int v)
 	}
 #endif
 
-#define EXT_IRQ_AMOUNT 0
+#define EXT_IRQ_AMOUNT 1
 
 /**
  * \brief EXTINTx and pin number map
@@ -91,6 +91,10 @@ static const struct _eic_map _map[] = {CONFIG_EIC_EXTINT_MAP};
 static void (*callback)(const uint32_t pin);
 
 static void _ext_irq_handler(void);
+
+void EIC_4_Handler(void) {
+        _ext_irq_handler();
+}
 
 /**
  * \brief Initialize external interrupt module
@@ -167,6 +171,11 @@ int32_t _ext_irq_init(void (*cb)(const uint32_t pin))
 	                             | 0);
 
 	hri_eic_set_CTRLA_ENABLE_bit(EIC);
+
+        // Only works for EIC_4, not generalized.
+        NVIC_DisableIRQ(EIC_4_IRQn);
+        NVIC_ClearPendingIRQ(EIC_4_IRQn);
+        NVIC_EnableIRQ(EIC_4_IRQn);
 
 	callback = cb;
 

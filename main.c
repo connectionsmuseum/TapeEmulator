@@ -16,6 +16,7 @@ int tape_state = STATE_IDLE;
 int tape_position = 0;
 int read_track = 0;
 int write_track = 0;
+bool init_flag = false;
 bool in_transfer_block = false;
 
 FATFS FatFs;
@@ -59,6 +60,8 @@ volatile int debug_tick_flag = 0;
 static struct timer_task TIMER_1_task1;
 static struct timer_task TIMER_1_task2;
 
+static void init_interrupt(void);
+
 static inline bool get_pin_active_low(const uint8_t pin) {
     return !gpio_get_pin_level(pin);
 }
@@ -74,9 +77,52 @@ void update_state() {
 
     int current_block;
     int intrablock_position;
+    char usb_printbuf[200];
 
     // Use this to time the update duration.
     gpio_set_pin_level(D12, true);
+
+    if(init_flag) {
+        // Not sure if we're supposed to display rewinding during init?
+        // set_pin_active_low(RWDINGA0, true);
+
+        // TTRDY0 has already been taken inactive during interrupt
+
+        if (cdcdf_acm_is_enabled()) {
+            snprintf(usb_printbuf, 99, "*** Initializing *** \n\r");
+            cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+        }
+
+        cancel_transfer();
+        tape_position = 0;
+
+        // Might as well load a block while we're here.
+        current_block = find_block(tape_position);
+        load_next_block(read_track, current_block);
+
+        delay_ms(1000);
+
+        if (cdcdf_acm_is_enabled()) {
+            snprintf(usb_printbuf, 99, "Done Initializing \n\r");
+            cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+        }
+
+        set_pin_active_low(RWDINGA0, false);
+        set_pin_active_low(TTRDY0, true);
+
+        init_flag = false;
+        ext_irq_register(TTINIT0, NULL);
+        ext_irq_register(TTINIT0, init_interrupt);
+
+        // D11 for IRQ timing
+        // gpio_set_pin_level(D11, false);
+
+        // update_state() timing
+        gpio_set_pin_level(D12, false);
+
+        return;
+    }
+
 
     // TODO:
     //   RWDINGA0 -- CTT is performing a tape rewind sequence
@@ -124,7 +170,7 @@ void update_state() {
         set_pin_active_low(TTBOTA0, false);
 
     }
-    // DEBUG set_pin_active_low(TTBOTA0, false);
+    // set_pin_active_low(TTBOTA0, false);
 
     // End of Tape
     if(tape_position >= MAX_TRACK_POSITION) {
@@ -142,6 +188,7 @@ void update_state() {
     } else {
         set_pin_active_low(LPEW0, false);
     }
+    // set_pin_active_low(LPEW0, false);
 
     // These are both used for multiple purposes in this function,
     // and should use the post-update position.
@@ -230,6 +277,15 @@ void debug_tick(const struct timer_task *const timer_task) {
 
 }
 
+// For handling INIT0 signal, which is too fast for polling.
+static void init_interrupt() {
+    init_flag = true;
+    set_pin_active_low(TTRDY0, false);
+
+    // Can set D11 for timing IRQ response.
+    // gpio_set_pin_level(D11, true);
+}
+
 int find_block(int tape_position) {
     return floor( tape_position / (IBG_BYTES + BLOCK_BYTES));
 }
@@ -266,6 +322,8 @@ int main(void)
 
     init_block_buffer(&SPI_1);
 
+    ext_irq_register(TTINIT0, init_interrupt);
+
     // Transport Ready
     set_pin_active_low(TTRDY0, true);
     // Cartridge is write enabled (from CTT to CTTC)
@@ -292,6 +350,7 @@ int main(void)
                 snprintf(usb_printbuf, 99, "State: %i, Track %i, DMA: %i, Position: %i, Block: %i. \n\r",
                          tape_state, read_track, (int) dma_running(), tape_position, block);
                 cdcdf_acm_write((uint8_t *)usb_printbuf, strlen(usb_printbuf));
+
                 /*
                 snprintf(usb_printbuf, 99, "MANEN0 %i, WRENAB0 %i, WTA10 %i, WTA00 %i, RTA10 %i, RTA00 %i \n\r",
                         get_pin_active_low(MANEN0), get_pin_active_low(WRENAB0), get_pin_active_low(WTA10), get_pin_active_low(WTA00),
