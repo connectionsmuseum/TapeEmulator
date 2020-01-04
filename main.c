@@ -183,12 +183,16 @@ void update_state() {
     // Early warning holes
     // This is a total guess. We might need to add some extra space
     // on the tape before the first block.
+    /*
     if((tape_position < 300) && (tape_position > 50)) {
         set_pin_active_low(LPEW0, true);
     } else {
         set_pin_active_low(LPEW0, false);
     }
-    // set_pin_active_low(LPEW0, false);
+    */
+    // Right now we're not sending early warning holes; need to get the logic
+    // right here before re-enabling.
+    set_pin_active_low(LPEW0, false);
 
     // These are both used for multiple purposes in this function,
     // and should use the post-update position.
@@ -199,7 +203,7 @@ void update_state() {
     if((intrablock_position > IBG_BYTES) || dma_running()) {
         set_pin_active_low(DATDET0, true);
     } else {
-        set_pin_active_low(DATDET0, true);
+        set_pin_active_low(DATDET0, false);
     }
 
     // Get the track settings, only if we're not sending data.

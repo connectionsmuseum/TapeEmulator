@@ -172,14 +172,29 @@ void send_block(int block_id) {
 
     buffer_to_send->locked = true;
     spi_m_dma_get_io_descriptor(_SPI, &io);
+
+    // Doing some things to try and clear the send buffer, but
+    // it doesn't seem to work.
+    spi_m_dma_disable(_SPI);
+    spi_m_dma_deinit(_SPI);
+    //
+
+    spi_m_dma_init(_SPI, SERCOM1);
+    // Hack hack. Removing the first byte of preamble, since a real tape
+    // drive might take a few cycles to get synced up.
+    io_write(io, buffer_to_send->block + 1, buffer_to_send->length - 1);
     spi_m_dma_enable(_SPI);
-    io_write(io, buffer_to_send->block, buffer_to_send->length);
+
     _dma_running = true;
 
 }
 
 void cancel_transfer() {
-    spi_m_dma_disable(_SPI);
+    // When interrupting the transfer this way, re-enabling DMA later seemed to continue
+    // sending the previous block that was interrupted. Not sure how to stop that from
+    // happening; easier just to transmit the entire block into the void.
+    // spi_m_dma_disable(_SPI);
+    //  spi_m_dma_deinit(_SPI);
     _dma_running = false;
     bufferA.locked = false;
     bufferB.locked = false;
