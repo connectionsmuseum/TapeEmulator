@@ -1,6 +1,7 @@
 #include <atmel_start.h>
 #include <math.h>
 #include <stdio.h>
+#include <queue.h>
 #include "usb_start.h"
 
 #include "pixel.h"
@@ -10,9 +11,40 @@
 #include "main.h"
 #include "block_transfer.h"
 
-bool d12_state = false;
+/* let's keep a sorted list of everything that can be found on the
+ * tape.  this uses a weird little set of macros that are documented
+ * in the manpage "queue", to set up a doubly-linked list.  the
+ * physical head position is tracked by the pointer `cur_tapething`.
+ */
+
+struct tapething {
+    int pos; /// position on the tape that this Thing is
+    enum {
+        TT_IBG, /// interblock gap follows (in natural tape direction)
+        TT_BLOCK, /// block follows
+        TT_HOLE, /// hole (mark) is here
+        TT_THIP, /// end of reel (tape will go thip-thip-thip)
+    } what;
+    union {
+        struct {
+            // information about a block start or ibg start
+            char* data;
+            size_t bytelen; /// length includes preamble, header, cksum, postamble
+            int track;
+        } block;
+        enum {
+            // information about there is a hole (mark) here, what it means
+            BEGIN_OF_TAPE, LOAD_POINT, EARLY_WARNING, END_OF_TAPE,
+        } mark;
+    };
+    LIST_ENTRY(tapething) entries;
+};
+
+LIST_HEAD(, tapething) tape = LIST_HEAD_INITIALIZER(tape);
+struct tapething* cur_tapething;
+
 bool d13_state = false;
-int tape_state = STATE_IDLE;
+tape_state_t motion_state = STATE_IDLE;
 int tape_position = 0;
 int read_track = 0;
 int write_track = 0;
@@ -48,6 +80,7 @@ volatile int debug_tick_flag = 0;
 #define SLOW_SPEED 15
 #define IBG_BYTES 310
 #define BLOCK_BYTES 1668
+#define INCH (1600/8) // bytes per inch
 #define MAX_TRACK_POSITION 740000 // Added some extra padding
 
 // Define the "current block" as including the IBG that preceeds the data.
@@ -68,6 +101,75 @@ static inline bool get_pin_active_low(const uint8_t pin) {
 
 static inline void set_pin_active_low(const uint8_t pin, const bool level) {
     gpio_set_pin_level(pin, !level);
+}
+
+void tt_insert(struct tapething tt) {
+    // xxx incomplete
+    struct tapething *tcur = LIST_HEAD(tape);
+}
+
+void setup_tape_load_all_blocks() {
+    struct tapething t;
+
+    /* tapes are complicated.  for simplicity, we put the whole tape
+     * in memory.  this function sets up the tape descriptor, laying
+     * down all the sectors and index marks.
+     */
+
+    /* tape has holes punched in it to mark particular positions.
+     * there are a lot of marks so i define a macro temporarily to
+     * reduce typing.  tape marks are talked about in inches so that's
+     * what we call this macro with.
+     */
+#define MARK(xtype, xpos) THING(TT_HOLE, xtype, xpos)
+#define THING(xwhat, xtype, xpos)         \
+    t = malloc(sizeof(struct tapething)); \
+    t.pos = xpos * INCH; \
+    t.what = xwhat; t.mark = xtype; \
+    tt_insert(t); t = NULL;
+
+    /* the load point is the zero datum for tape locations. */
+    MARK(LOAD_POINT, 0);
+
+    /* 36 inches before the load point is a sequence of three BOT
+     * marks */
+    MARK(BEGIN_OF_TAPE, -(18 ));
+    MARK(BEGIN_OF_TAPE, -(18 * 2));
+    MARK(BEGIN_OF_TAPE, -(18 * 3));
+    /* and 18 inches before the first BOT mark is the physical start of
+     * the medium */
+    THING(TT_THIP, 0, -(18 * 4));
+
+    /* the tape is 300 feet between load point and early warning
+     * marks. */
+    MARK(EARLY_WARNING, 300*12);
+    /* then 48 inches later there are 3 EOT marks spaced 18 inches
+     * apart. */
+    MARK(END_OF_TAPE, 300*12 + 48);
+    MARK(END_OF_TAPE, 300*12 + 48 + 18);
+    MARK(END_OF_TAPE, 300*12 + 48 + 18*2);
+    /* and finally the physical medium ends 18 inches after the last
+     * EOT mark */
+    THING(TT_THIP, 0, 300*12 + 48 + 18*2 + 18);
+
+#undef MARK
+#undef THING
+
+    /* now we need to load blocks.
+     *
+     * aspirationally, what will go here is some code to read a tape
+     * descriptor file, which would be a text file or something with a
+     * bunch of lines saying "at position 281412, begins a block on
+     * track 2 with data from file xyz.bin", "at position 290240,
+     * begins an ibg on track 2", etc.  
+     *
+     * it might also make sense to put the physical marks (above) in
+     * that file instead of in code, but i don't have the brain for
+     * that at the moment.
+     */
+    // xxx
+
+    return;
 }
 
 void update_state() {

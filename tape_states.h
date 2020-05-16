@@ -1,9 +1,12 @@
+#pragma once
 
-#define STATE_IDLE 0
-#define STATE_FORWARD 1
-#define STATE_FF 2
-#define STATE_REV 3
-#define STATE_FR 4
+typedef enum tape_state_t {
+    STATE_STOP = 0,
+    STATE_FORWARD,
+    STATE_FF,
+    STATE_REV,
+    STATE_FR,
+};
 
-extern int tape_state;
+extern tape_state_t tape_state;
 
