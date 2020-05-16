@@ -14,7 +14,7 @@
 /* let's keep a sorted list of everything that can be found on the
  * tape.  this uses a weird little set of macros that are documented
  * in the manpage "queue", to set up a doubly-linked list.  the
- * physical head position is tracked by the pointer `cur_tapething`.
+ * physical head position is tracked by the pointer `tapehead_point`.
  */
 
 struct tapething {
@@ -37,11 +37,31 @@ struct tapething {
             BEGIN_OF_TAPE, LOAD_POINT, EARLY_WARNING, END_OF_TAPE,
         } mark;
     };
+    /* no user-serviceable parts inside */
     LIST_ENTRY(tapething) entries;
 };
 
 LIST_HEAD(, tapething) tape = LIST_HEAD_INITIALIZER(tape);
-struct tapething* cur_tapething;
+/* the pointy end of the read-head consists of a pointer to whatever
+ * it's currently over. it also has a position, which better
+ * correspond.
+ */
+struct tapething* tapehead_point;
+int tapehead_pos;
+
+/* we maintain an area of the list between two things inclusive, where
+ * all the data blocks are guaranteed to be in memory.  ideally the
+ * tapehead_point is always in this area.  the "ahead" pointer has a
+ * higher numerical position than tapehead_point, and "behind" lower.
+ *
+ * when the tapehead moves, we ought to read some more blocks in the
+ * appropriate direction, to guarantee that it can read unimpeded.
+ * however this must be scheduled to not disrupt other operations.
+ *
+ * when there is memory pressure, we shrink the area and deallocate
+ * data blocks, nulling out their pointers in the relevant tapething.
+ */
+struct tapething * tapehead_ahead, * tapehead_behind;
 
 bool d13_state = false;
 tape_state_t motion_state = STATE_IDLE;
